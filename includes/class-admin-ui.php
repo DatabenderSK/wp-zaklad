@@ -241,12 +241,18 @@ class WPBL_Admin_UI {
 
     private function process_flush(): void {
         global $wpdb;
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_%'");
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+                $wpdb->esc_like('_transient_') . '%'
+            )
+        );
+        wp_cache_flush();
         $this->redirect(4);
     }
 
     private function redirect(int|string $code): void {
-        wp_redirect(admin_url('options-general.php?page=wp-zaklad&wpbl_updated=' . $code));
+        wp_safe_redirect(admin_url('options-general.php?page=wp-zaklad&wpbl_updated=' . $code));
         exit;
     }
 
@@ -344,13 +350,13 @@ class WPBL_Admin_UI {
 
             <!-- Header -->
             <div class="wpbl-page-header">
-                <h1><?php esc_html_e('WP Základ'); ?> <span class="wpbl-version">v<?php echo esc_html(WPBL_VERSION); ?></span></h1>
+                <h1><?php echo esc_html( 'WP Základ' ); ?> <span class="wpbl-version">v<?php echo esc_html(WPBL_VERSION); ?></span></h1>
                 <div class="wpbl-header-actions">
                     <form method="post" class="wpbl-lang-form">
                         <?php wp_nonce_field('wpbl_lang', 'wpbl_nonce'); ?>
                         <input type="hidden" name="wpbl_action" value="set_lang">
                         <div class="wpbl-lang-switcher">
-                            <label for="wpbl-lang"><?php esc_html_e(wpbl_t('lang_label')); ?>:</label>
+                            <label for="wpbl-lang"><?php echo esc_html( wpbl_t('lang_label') ); ?>:</label>
                             <select id="wpbl-lang" name="wpbl_lang">
                                 <option value="sk" <?php selected($current_lang, 'sk'); ?>>Slovensky</option>
                                 <option value="en" <?php selected($current_lang, 'en'); ?>>English</option>

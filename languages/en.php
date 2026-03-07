@@ -190,6 +190,7 @@ return [
     // Security – new
     'hide_updates_label'             => 'Hide Updates for Clients',
     'hide_updates_desc'              => 'Hides update notifications and the updates page for all users except site administrators.',
+    'login_error_generic'            => '<strong>Error:</strong> Incorrect login credentials.',
     'hide_login_errors_label'        => 'Hide Login Error Messages',
     'hide_login_errors_desc'         => 'WordPress by default shows specific errors (e.g. "Wrong password") – attackers can use this to confirm that a username exists. This setting always returns a generic message instead.',
     'block_author_scan_label'        => 'Block Author Scan via URL',

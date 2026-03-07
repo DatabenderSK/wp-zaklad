@@ -190,6 +190,7 @@ return [
     // Security – nové
     'hide_updates_label'             => 'Skryť aktualizácie pre klientov',
     'hide_updates_desc'              => 'Skryje upozornenia na aktualizácie a stránku aktualizácií pre všetkých okrem správcov webu.',
+    'login_error_generic'            => '<strong>Chyba:</strong> Nesprávne prihlasovacie údaje.',
     'hide_login_errors_label'        => 'Skryť chybové hlásenia pri prihlásení',
     'hide_login_errors_desc'         => 'WordPress predvolene zobrazuje konkrétnu chybu (napr. "Nesprávne heslo") – z tej útočník zistí, že používateľské meno existuje. Toto nastavenie vráti vždy rovnakú generickú správu.',
     'block_author_scan_label'        => 'Blokovať skenovanie autorov cez URL',

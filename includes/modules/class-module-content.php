@@ -77,28 +77,178 @@ class WPBL_Module_Content extends WPBL_Module_Base {
         }
     }
 
+    /**
+     * Allow SVG uploads for administrators only.
+     * Restricted to manage_options to prevent editor-level users from uploading
+     * SVGs that could execute JavaScript when opened directly in the browser.
+     */
     public function allow_svg_mime(array $mimes): array {
-        $mimes['svg']  = 'image/svg+xml';
-        $mimes['svgz'] = 'image/svg+xml';
+        if (current_user_can('manage_options')) {
+            $mimes['svg'] = 'image/svg+xml';
+        }
         return $mimes;
     }
 
+    /**
+     * Sanitize uploaded SVG files using a DOMDocument-based allowlist approach.
+     * Blocklist-based regex sanitizers (e.g. stripping <script>) are bypassable
+     * via <foreignObject>, <use xlink:href>, CDATA blocks, and encoding tricks.
+     * An allowlist of safe elements and attributes is the only reliable defence.
+     */
     public function sanitize_svg_upload(array $file): array {
         $ext = strtolower(pathinfo($file['name'] ?? '', PATHINFO_EXTENSION));
-        if (!in_array($ext, ['svg', 'svgz'], true)) {
+        if ($ext !== 'svg') {
             return $file;
         }
-        $content = file_get_contents($file['tmp_name'] ?? '');
+
+        if (empty($file['tmp_name']) || !is_readable($file['tmp_name'])) {
+            $file['error'] = 'Could not read uploaded SVG file.';
+            return $file;
+        }
+
+        $content = file_get_contents($file['tmp_name']);
         if ($content === false) {
-            $file['error'] = 'Could not read SVG file.';
+            $file['error'] = 'Could not read uploaded SVG file.';
             return $file;
         }
-        $content = preg_replace('/<script[\s\S]*?<\/script>/i', '', $content);
-        $content = preg_replace('/\bon\w+\s*=\s*"[^"]*"/i', '', $content);
-        $content = preg_replace("/\\bon\\w+\\s*=\\s*'[^']*'/i", '', $content);
-        $content = preg_replace('/javascript\s*:/i', '', $content);
-        file_put_contents($file['tmp_name'], $content);
+
+        $sanitized = $this->sanitize_svg_content($content);
+        if ($sanitized === false) {
+            $file['error'] = 'Invalid or unsafe SVG file rejected during sanitization.';
+            return $file;
+        }
+
+        file_put_contents($file['tmp_name'], $sanitized);
         return $file;
+    }
+
+    /**
+     * Parse SVG with DOMDocument and strip everything not on the allowlist.
+     * Prevents XXE via LIBXML_NONET | LIBXML_NOENT.
+     *
+     * @return string|false Sanitized SVG markup, or false if the document is invalid.
+     */
+    private function sanitize_svg_content(string $content): string|false {
+        $allowed_elements = [
+            'svg', 'g', 'path', 'circle', 'rect', 'polygon', 'polyline', 'line',
+            'ellipse', 'use', 'defs', 'title', 'desc', 'symbol', 'clipPath',
+            'linearGradient', 'radialGradient', 'stop', 'filter', 'mask', 'pattern',
+            'text', 'tspan', 'image',
+            'feBlend', 'feColorMatrix', 'feFlood', 'feGaussianBlur',
+            'feMerge', 'feMergeNode', 'feOffset', 'feComposite', 'feTurbulence',
+            'feDisplacementMap',
+        ];
+
+        $allowed_attributes = [
+            'id', 'class', 'style', 'viewBox', 'width', 'height', 'x', 'y',
+            'cx', 'cy', 'r', 'rx', 'ry', 'd', 'fill', 'stroke', 'stroke-width',
+            'transform', 'opacity', 'points', 'x1', 'y1', 'x2', 'y2',
+            'clip-path', 'clip-rule', 'fill-rule', 'fill-opacity', 'stroke-opacity',
+            'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'stop-color',
+            'stop-opacity', 'gradientUnits', 'gradientTransform', 'patternUnits',
+            'patternTransform', 'preserveAspectRatio', 'xmlns', 'xmlns:xlink',
+            'xlink:href', 'href', 'type', 'in', 'in2', 'result', 'values',
+            'stdDeviation', 'offset', 'dx', 'dy', 'font-size', 'font-family',
+            'font-weight', 'text-anchor', 'dominant-baseline', 'color',
+            'color-interpolation-filters', 'flood-color', 'flood-opacity',
+            'lighting-color', 'marker-end', 'marker-start', 'marker-mid',
+            'mask', 'visibility', 'display', 'overflow',
+        ];
+
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        // LIBXML_NONET  – prevent external network requests (XXE via DTD)
+        // LIBXML_NOENT  – prevent entity expansion
+        $loaded = $dom->loadXML($content, LIBXML_NONET | LIBXML_NOENT);
+        libxml_clear_errors();
+
+        if (!$loaded) {
+            return false;
+        }
+
+        $root = $dom->documentElement;
+        if (!$root || strtolower($root->localName) !== 'svg') {
+            return false;
+        }
+
+        $this->sanitize_svg_node($root, $allowed_elements, $allowed_attributes);
+
+        return $dom->saveXML($dom->documentElement);
+    }
+
+    /**
+     * Recursively walk the SVG DOM tree.
+     * – Removes elements not on the allowlist (incl. <script>, <foreignObject>, <animate>).
+     * – Removes attributes not on the allowlist and all on* event handlers.
+     * – Restricts href / xlink:href to internal fragment references (#id) only.
+     * – Strips dangerous CSS patterns from style attributes.
+     * – Removes processing instructions and comments.
+     */
+    private function sanitize_svg_node(DOMElement $node, array $allowed_elements, array $allowed_attributes): void {
+        $to_remove = [];
+
+        foreach ($node->childNodes as $child) {
+            if ($child->nodeType === XML_ELEMENT_NODE) {
+                /** @var DOMElement $child */
+                if (!in_array(strtolower($child->localName), $allowed_elements, true)) {
+                    $to_remove[] = $child;
+                    continue;
+                }
+
+                // Collect attributes to remove (cannot modify during iteration)
+                $attrs_to_remove = [];
+                foreach (iterator_to_array($child->attributes) as $attr) {
+                    /** @var DOMAttr $attr */
+                    $attr_local = strtolower($attr->localName);
+
+                    // Remove all event handlers (onclick, onload, onmouseover …)
+                    if (str_starts_with($attr_local, 'on')) {
+                        $attrs_to_remove[] = $attr->nodeName;
+                        continue;
+                    }
+
+                    // Enforce attribute allowlist
+                    if (!in_array($attr->nodeName, $allowed_attributes, true) &&
+                        !in_array($attr_local, $allowed_attributes, true)) {
+                        $attrs_to_remove[] = $attr->nodeName;
+                        continue;
+                    }
+
+                    // href / xlink:href: only allow internal fragment references (#id)
+                    if (in_array($attr_local, ['href', 'xlink:href'], true)) {
+                        if (!str_starts_with(ltrim($attr->value), '#')) {
+                            $attrs_to_remove[] = $attr->nodeName;
+                        }
+                        continue;
+                    }
+
+                    // style: strip expression(), behavior:, javascript:, vbscript:
+                    if ($attr_local === 'style') {
+                        $safe_style = preg_replace(
+                            '/expression\s*\(|behavior\s*:|javascript\s*:|vbscript\s*:/i',
+                            '',
+                            $attr->value
+                        );
+                        $child->setAttribute($attr->nodeName, $safe_style ?? '');
+                    }
+                }
+
+                foreach ($attrs_to_remove as $attr_name) {
+                    $child->removeAttribute($attr_name);
+                }
+
+                // Recurse into allowed child elements
+                $this->sanitize_svg_node($child, $allowed_elements, $allowed_attributes);
+
+            } elseif (in_array($child->nodeType, [XML_PI_NODE, XML_COMMENT_NODE], true)) {
+                // Remove processing instructions (<?xml-stylesheet ...?>) and comments
+                $to_remove[] = $child;
+            }
+        }
+
+        foreach ($to_remove as $el) {
+            $node->removeChild($el);
+        }
     }
 
     public function year_shortcode(): string {
@@ -115,14 +265,14 @@ class WPBL_Module_Content extends WPBL_Module_Base {
 
     public function redirect_archives(): void {
         if (is_attachment() || is_date()) {
-            wp_redirect(home_url('/'), 301);
+            wp_safe_redirect(home_url('/'), 301);
             exit;
         }
     }
 
     public function redirect_author_archive(): void {
         if (is_author()) {
-            wp_redirect(home_url('/'), 301);
+            wp_safe_redirect(home_url('/'), 301);
             exit;
         }
     }

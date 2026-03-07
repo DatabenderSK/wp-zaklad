@@ -43,6 +43,13 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             if (!defined('DISALLOW_FILE_EDIT')) {
                 define('DISALLOW_FILE_EDIT', true);
             }
+            // Belt-and-suspenders: also remove editor menu items directly.
+            // The constant is the authoritative guard; menu removal covers edge cases
+            // where the constant may be evaluated before plugins load.
+            add_action('admin_menu', static function () {
+                remove_submenu_page('themes.php', 'theme-editor.php');
+                remove_submenu_page('plugins.php', 'plugin-editor.php');
+            }, 999);
         }
 
         if ($this->get('wpzaklad_disable_rest_unauth')) {
@@ -63,14 +70,14 @@ class WPBL_Module_Security extends WPBL_Module_Base {
         }
 
         if ($this->get('wpzaklad_hide_login_errors')) {
-            add_filter('login_errors', fn() => '<strong>Chyba:</strong> Nesprávne prihlasovacie údaje.');
+            add_filter('login_errors', fn() => wpbl_t('login_error_generic'));
             add_filter('login_shake_error_codes', '__return_empty_array');
         }
 
         if ($this->get('wpzaklad_block_author_scan')) {
             add_action('template_redirect', function () {
                 if (!is_admin() && isset($_GET['author'])) {
-                    wp_redirect(home_url('/'), 301);
+                    wp_safe_redirect(home_url('/'), 301);
                     exit;
                 }
             });
@@ -111,7 +118,7 @@ class WPBL_Module_Security extends WPBL_Module_Base {
 
     public function redirect_author_archive(): void {
         if (is_author()) {
-            wp_redirect(home_url('/'), 301);
+            wp_safe_redirect(home_url('/'), 301);
             exit;
         }
     }

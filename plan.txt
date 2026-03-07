@@ -1,0 +1,299 @@
+==========================================================================
+WP ZÁKLAD – PLÁN IMPLEMENTÁCIE (v3)
+==========================================================================
+Plugin: WP Základ | Súbor: wp-baseline.php | Verzia: 1.0.0-alpha
+Admin: Nastavenia → WP Základ | Slug: wp-zaklad | Hook: settings_page_wp-zaklad
+==========================================================================
+
+ARCHITEKTÚRA (rýchly prehľad)
+──────────────────────────────
+- Moduly: includes/modules/class-module-*.php
+- Každý modul má: get_id(), get_label(), get_defaults(), get_fields(), init()
+- Nastavenia: jedna DB option "wpzaklad_settings" (array)
+- Preklady: languages/sk.php + languages/en.php (PHP array, funkcia wpbl_t())
+- Admin UI: includes/class-admin-ui.php (renderuje taby, polia, Tools)
+- Zaregistrovanie modulu: includes/class-core.php → $module_classes[]
+- Field types: checkbox, text, number, textarea, select, color, media
+- Keď pridáš pole: 1) default do get_defaults(), 2) pole do get_fields(),
+  3) logika do init(), 4) stringy do sk.php + en.php
+
+EXISTUJÚCE MODULY (čo už je hotové, NEMEŇ)
+────────────────────────────────────────────
+Optimization  : emoji, embeds, rss, xmlrpc, jquery-migrate, self-pingbacks,
+                clean_head, block_update_emails, lazy_load_iframes
+SEO           : discourage_indexing, noindex_search, noindex_archives,
+                remove_feed_links
+Security      : hide_wp_version (+PHP header), disable_file_edit,
+                disable_rest_unauth, disable_user_rest (+author redirect),
+                security_headers, hide_updates_for_clients
+Appearance    : custom_login_logo, clean_dashboard, hide_admin_for_clients,
+                colored_post_statuses + 4 farby
+Content       : disable_comments, disable_gutenberg, allow_svg,
+                lowercase_filenames, year_shortcode (+ $$rok$$),
+                search_title_shortcode, clean_block_editor, disable_archives,
+                clean_archive_titles, disable_author_archive
+Maintenance   : maintenance_mode (503), headline, text (textarea), bg color
+Whitelabel    : hide_wp_logo, admin_footer_text, hide_howdy, hide_frontend_bar
+Scripts       : gtm_id, head_code, footer_code
+Performance   : heartbeat, remove_query_strings, disable_big_image,
+                revisions_limit, disable_dashicons, jpeg_quality
+Email         : from_name, from_email
+Admin Menu    : drag&drop menu order, toolbar quick links
+System        : sysinfo_widget (dashboard widget), track_last_login
+
+
+==========================================================================
+NOVÉ FUNKCIE NA IMPLEMENTÁCIU
+==========================================================================
+
+──────────────────────────────────────────────────────────────────────────
+1. SECURITY – 3 nové polia
+──────────────────────────────────────────────────────────────────────────
+
+Súbor: includes/modules/class-module-security.php
+
+A) wpzaklad_hide_login_errors (checkbox, default 0)
+   Popis: Skryje konkrétnu chybu pri prihlásení (napr. "Wrong password"
+          prezradí že username existuje). Vráti generickú správu.
+   Implementácia:
+     add_filter('login_errors', function($error) {
+         return '<strong>Chyba:</strong> Nesprávne prihlasovacie údaje.';
+     });
+     add_filter('login_shake_error_codes', '__return_empty_array');
+   String kľúče: hide_login_errors_label, hide_login_errors_desc
+
+B) wpzaklad_block_author_scan (checkbox, default 0, recommended)
+   Popis: /?author=1 presmeruje na /author/admin/ a odhalí username admina
+          (iná cesta ako REST API – treba blokovať oboje).
+          Toto je doplnok k disable_user_rest.
+   Implementácia:
+     add_action('template_redirect', function() {
+         if (!is_admin() && isset($_GET['author'])) {
+             wp_redirect(home_url('/'), 301);
+             exit;
+         }
+     });
+   String kľúče: block_author_scan_label, block_author_scan_desc
+
+C) wpzaklad_hsts_header (checkbox, default 0)
+   Popis: Pridá Strict-Transport-Security hlavičku. Prehliadač vždy
+          použije HTTPS – zamedzí downgrade útoku.
+          Zapínaj len ak máš HTTPS správne nastavené.
+   Implementácia (do send_headers alebo existujúcej send_security_headers,
+   ale radšej samostatne):
+     add_action('send_headers', function() {
+         if (is_ssl() && !headers_sent()) {
+             header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+         }
+     });
+   String kľúče: hsts_header_label, hsts_header_desc
+
+──────────────────────────────────────────────────────────────────────────
+2. SEO – 1 nové pole
+──────────────────────────────────────────────────────────────────────────
+
+Súbor: includes/modules/class-module-seo.php
+
+A) wpzaklad_www_redirect (select, default '')
+   Popis: Presmerovanie www ↔ non-www. Dôležité pre SEO canonical.
+   Options:
+     ''       => 'Vypnuté'
+     'www'    => 'Presmerovať na www.domena.sk'
+     'nonwww' => 'Presmerovať na domena.sk (bez www)'
+   Implementácia:
+     $redirect = $this->get('wpzaklad_www_redirect');
+     if ($redirect) {
+         add_action('template_redirect', function() use ($redirect) {
+             $host = $_SERVER['HTTP_HOST'] ?? '';
+             $uri  = $_SERVER['REQUEST_URI'] ?? '/';
+             $has_www = str_starts_with($host, 'www.');
+             if ($redirect === 'www' && !$has_www) {
+                 wp_redirect('https://www.' . $host . $uri, 301); exit;
+             }
+             if ($redirect === 'nonwww' && $has_www) {
+                 wp_redirect('https://' . substr($host, 4) . $uri, 301); exit;
+             }
+         });
+     }
+   String kľúče: www_redirect_label, www_redirect_desc,
+                  www_redirect_off, www_redirect_www, www_redirect_nonwww
+
+──────────────────────────────────────────────────────────────────────────
+3. APPEARANCE – 1 nové pole
+──────────────────────────────────────────────────────────────────────────
+
+Súbor: includes/modules/class-module-appearance.php
+
+A) wpzaklad_hide_admin_notices (checkbox, default 0)
+   Popis: Skryje admin notifikácie od pluginov (promo, review výzvy,
+          update nag) pre ne-adminov. Admini ich vidia normálne.
+   Implementácia:
+     add_action('admin_head', function() {
+         if (!current_user_can('manage_options')) {
+             echo '<style>.notice:not(.wpbl-notice),.updated:not(.updated-message),.error:not(.wpbl-notice){display:none!important;}</style>';
+         }
+     });
+   String kľúče: hide_admin_notices_label, hide_admin_notices_desc
+
+──────────────────────────────────────────────────────────────────────────
+4. EMAIL – 1 nové pole + testovací email (Tools)
+──────────────────────────────────────────────────────────────────────────
+
+Súbor: includes/modules/class-module-email.php
+
+A) wpzaklad_disable_new_user_email (checkbox, default 0)
+   Popis: WordPress posiela adminovi email pri každej novej registrácii.
+          Na weboch s WooCommerce alebo registráciou je to annoying.
+   Implementácia:
+     add_action('init', function() {
+         remove_action('register_new_user',     'wp_send_new_user_notifications');
+         remove_action('edit_user_created_user', 'wp_send_new_user_notifications');
+     });
+   String kľúče: disable_new_user_email_label, disable_new_user_email_desc
+
+B) Testovací email – pridať do Tools tabu (class-admin-ui.php)
+   Popis: Tlačidlo "Odoslať testovací email" → pošle wp_mail() na admin
+          email. Okamžitá spätná väzba či email funguje.
+   Implementácia:
+   - Nová akcia: wpbl_action=test_email, nonce: wpbl_test_email
+   - V handle_form_actions(): case 'test_email': odošle wp_mail + redirect
+   - V render_tools_tab(): nová sekcia s tlačidlom
+   - Redirect kód: 5 → 'test_email_sent', alebo 'test_email_error'
+   - Pridať správy do render_notice()
+   String kľúče: tools_test_email_title, tools_test_email_desc,
+                  test_email_btn, test_email_success, test_email_error
+
+──────────────────────────────────────────────────────────────────────────
+5. TOOLS TAB – DB Cleanup sekcia
+──────────────────────────────────────────────────────────────────────────
+
+Súbor: includes/class-admin-ui.php → render_tools_tab()
+
+Pridaj novú sekciu "Vyčistiť databázu" s dvoma akciami:
+
+A) Odstrániť auto-drafts
+   - wpbl_action=clean_auto_drafts, nonce: wpbl_clean_db
+   - Query: DELETE FROM {$wpdb->posts} WHERE post_status = 'auto-draft'
+   - Zobraziť počet pred zmazaním (SELECT COUNT(*) ...)
+   - Redirect kód: 6 → 'auto_drafts_cleaned'
+
+B) Odstrániť spam komentáre
+   - wpbl_action=clean_spam, nonce: wpbl_clean_db (rovnaký nonce pre oba)
+   - Query: DELETE FROM {$wpdb->comments} WHERE comment_approved = 'spam'
+   - Zobraziť počet pred zmazaním
+   - Redirect kód: 7 → 'spam_cleaned'
+
+Vzor pre sekciu v render_tools_tab() (pozri existujúce sekcie ako vzor).
+
+Nové language kľúče pre Tools:
+  tools_cleanup_title, tools_cleanup_desc,
+  cleanup_autodrafts_btn, cleanup_autodrafts_count,
+  cleanup_spam_btn, cleanup_spam_count,
+  cleanup_autodrafts_success, cleanup_spam_success
+
+──────────────────────────────────────────────────────────────────────────
+6. PRIVACY – 1 nové pole (Optimization alebo nový Privacy modul)
+──────────────────────────────────────────────────────────────────────────
+
+Odporúčam pridať do OPTIMIZATION modulu (GDPR = optimalizácia/privacy).
+
+Súbor: includes/modules/class-module-optimization.php
+
+A) wpzaklad_disable_gravatars (checkbox, default 0)
+   Popis: Gravatars načítavajú obrázky z gravatar.com (externý server)
+          = GDPR problém + zbytočný HTTP request.
+   Implementácia:
+     add_filter('option_show_avatars', '__return_false');
+   String kľúče: disable_gravatars_label, disable_gravatars_desc
+
+──────────────────────────────────────────────────────────────────────────
+7. DISTRIBÚCIA – plugin-update-checker (GitHub auto-update)
+──────────────────────────────────────────────────────────────────────────
+
+Cieľ: Všetky klientske weby automaticky dostanú notifikáciu o aktualizácii
+      presne tak ako pri oficálnych WP pluginoch (bez wordpress.org).
+
+Knižnica: YahnisElsts/plugin-update-checker v5
+Download: https://github.com/YahnisElsts/plugin-update-checker
+          → releases → stiahnuť zip → extrahovať do libs/plugin-update-checker/
+
+Štruktúra po inštalácii:
+  wp-zaklad/
+    libs/
+      plugin-update-checker/
+        plugin-update-checker.php   ← hlavný súbor
+        Puc/                        ← knižnica
+    wp-baseline.php
+    ...
+
+Kód do wp-baseline.php (za konštanty, pred boot):
+
+  // Auto-update via GitHub
+  $puc_file = WPBL_DIR . 'libs/plugin-update-checker/plugin-update-checker.php';
+  if (file_exists($puc_file)) {
+      require_once $puc_file;
+      $checker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+          'https://github.com/GITHUB_USERNAME/wp-zaklad/',
+          __FILE__,
+          'wp-zaklad'
+      );
+      $checker->setBranch('main');
+      // Pre private repozitár pridaj:
+      // $checker->setAuthentication('GITHUB_PERSONAL_ACCESS_TOKEN');
+  }
+
+GitHub workflow pre aktualizácie:
+  1. Uprav kód
+  2. Zmeň Version: v wp-baseline.php (napr. 1.1.0)
+  3. git commit + push
+  4. Na GitHube: Releases → New release → Tag: v1.1.0
+  5. Weby dostanú notifikáciu automaticky (do 12h alebo pri otvorení Pluginy)
+
+GITHUB_USERNAME treba nahradiť pred implementáciou.
+
+
+==========================================================================
+PORADIE IMPLEMENTÁCIE
+==========================================================================
+
+1. sk.php + en.php  → všetky nové string kľúče
+2. class-module-security.php  → hide_login_errors, block_author_scan, hsts
+3. class-module-seo.php  → www_redirect
+4. class-module-appearance.php  → hide_admin_notices
+5. class-module-optimization.php  → disable_gravatars
+6. class-module-email.php  → disable_new_user_email
+7. class-admin-ui.php  → testovací email + DB cleanup v Tools tabe
+8. libs/  → stiahnuť a vložiť plugin-update-checker
+9. wp-baseline.php  → inicializácia update checkera
+
+==========================================================================
+NOVÉ STRING KĽÚČE (oba súbory: sk.php + en.php)
+==========================================================================
+
+Security:
+  hide_login_errors_label / hide_login_errors_desc
+  block_author_scan_label / block_author_scan_desc
+  hsts_header_label / hsts_header_desc
+
+SEO:
+  www_redirect_label / www_redirect_desc
+  www_redirect_off / www_redirect_www / www_redirect_nonwww
+
+Appearance:
+  hide_admin_notices_label / hide_admin_notices_desc
+
+Optimization:
+  disable_gravatars_label / disable_gravatars_desc
+
+Email:
+  disable_new_user_email_label / disable_new_user_email_desc
+
+Tools:
+  tools_test_email_title / tools_test_email_desc
+  test_email_btn / test_email_success / test_email_error
+  tools_cleanup_title / tools_cleanup_desc
+  cleanup_autodrafts_btn / cleanup_autodrafts_count
+  cleanup_spam_btn / cleanup_spam_count
+  cleanup_autodrafts_success / cleanup_spam_success
+
+==========================================================================

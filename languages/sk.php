@@ -1,0 +1,235 @@
+<?php
+return [
+    // Admin UI
+    'page_title'              => 'WP Základ – Nastavenia',
+    'menu_title'              => 'WP Základ',
+    'save_button'             => 'Uložiť nastavenia',
+    'saved_notice'            => 'Nastavenia boli uložené.',
+    'lang_label'              => 'Jazyk',
+    'search_placeholder'      => 'Hľadať nastavenie...',
+    'badge_recommended'       => '✓ Odporúčané',
+    'select_image'            => 'Vybrať obrázok',
+    'remove_image'            => 'Odstrániť',
+
+    // Tabs
+    'tab_optimization'  => 'Optimalizácia',
+    'tab_seo'           => 'SEO',
+    'tab_security'      => 'Bezpečnosť',
+    'tab_appearance'    => 'Vzhľad',
+    'tab_content'       => 'Obsah & Médiá',
+    'tab_maintenance'   => 'Údržba',
+    'tab_whitelabel'    => 'White Label',
+    'tab_scripts'       => 'Skripty',
+    'tab_performance'   => 'Výkon',
+    'tab_tools'         => 'Nástroje',
+    'tab_admin_menu'    => 'Admin Menu',
+    'tab_system'        => 'Systém',
+
+    // Optimization
+    'disable_emoji_label'            => 'Vypnúť emoji skripty',
+    'disable_emoji_desc'             => 'Odstráni emoji JavaScript a CSS štýly zo všetkých stránok.',
+    'disable_embeds_label'           => 'Vypnúť oEmbed / vloženia',
+    'disable_embeds_desc'           => 'WordPress vie automaticky premeniť URL na vložené video alebo príspevok – stačí vložiť YouTube link na nový riadok. <strong>Ak na webe vkladáš YouTube videá alebo sociálne siete, toto nechaj vypnuté.</strong> Zapni len ak vieš, že embedy nepotrebuješ vôbec (napr. čisto firemný web bez blogových videí).',
+    'remove_rss_label'               => 'Odstrániť RSS kanály',
+    'remove_rss_desc'                => 'Odstráni RSS a Atom kanály zo stránky a z HTML hlavičky.',
+    'disable_xmlrpc_label'           => 'Vypnúť XML-RPC',
+    'disable_xmlrpc_desc'            => 'Blokuje XML-RPC rozhranie, ktoré môže byť zneužité na brute-force útoky.',
+    'remove_jquery_migrate_label'    => 'Odstrániť jQuery Migrate',
+    'remove_jquery_migrate_desc'     => 'Odstráni zastaraný jQuery Migrate skript z frontendu webu.',
+    'disable_self_pingbacks_label'   => 'Vypnúť self-pingbacky',
+    'disable_self_pingbacks_desc'    => 'WordPress automaticky "pinguje" vlastné stránky keď z článku odkazujete na iný článok toho istého webu. Vytvára zbytočné notifikácie a záznamy v databáze – pre prezentačné weby nemá žiadny zmysel.',
+
+    // SEO
+    'discourage_indexing_label' => 'Zakázať indexovanie celého webu',
+    'discourage_indexing_desc'  => 'Povie vyhľadávačom aby web neindexovali (nastaví blog_public = 0, rovnaká funkcia ako Nastavenia → Čítanie → "Odrádzať vyhľadávače od indexovania webu"). <strong>Používaj len počas vývoja – na produkčnom webe nechaj vypnuté.</strong>',
+    'noindex_search_label'      => 'Noindex pre výsledky vyhľadávania',
+    'noindex_search_desc'       => 'Pridá noindex meta tag na stránky výsledkov interného vyhľadávania.',
+    'noindex_archives_label'    => 'Noindex pre archívy',
+    'noindex_archives_desc'     => 'Pridá noindex tag na kategórie, štítky a dátumové archívy.',
+    'remove_feed_links_label'   => 'Odstrániť feed linky z &lt;head&gt;',
+    'remove_feed_links_desc'    => 'Odstráni automaticky generované &lt;link rel="alternate"&gt; feed linky z HTML hlavičky.',
+
+    // Security
+    'hide_wp_version_label'         => 'Skryť verziu WP a PHP',
+    'hide_wp_version_desc'          => 'Odstráni číslo verzie WordPress z &lt;head&gt; a RSS kanálov. Zároveň skryje PHP verziu odstránením X-Powered-By HTTP hlavičky.',
+    'disable_file_edit_label'       => 'Vypnúť editor súborov v administrácii',
+    'disable_file_edit_desc'        => 'Skryje editor tém a pluginov – bezpečnostné odporúčanie pre produkčné weby.',
+    'disable_rest_unauth_label'     => 'Vypnúť REST API pre neprihlásených',
+    'disable_rest_unauth_desc'      => 'REST API je rozhranie cez ktoré WordPress komunikuje s inými aplikáciami. Toto nastavenie zablokuje celý prístup pre neprihlásených. <strong>Pozor:</strong> môže rozbiť Contact Form 7, Elementor a iné pluginy ktoré REST API používajú. Bezpečnejšia voľba je skryť iba users endpoint (nastavenie nižšie).',
+    'disable_user_rest_label'       => 'Skryť používateľov cez REST API a archívy autorov',
+    'disable_user_rest_desc'        => 'Endpoint /wp/v2/users verejne vystavuje prihlasovacie mená adminov a archívy autorov ich odhaľujú ďalej. Uzavrie oboje bez vplyvu na ostatné pluginy.',
+    'security_headers_label'        => 'Bezpečnostné HTTP hlavičky',
+    'security_headers_desc'         => 'Pridá tri ochranné hlavičky: zabraňuje vkladaniu webu do iframe iných stránok (clickjacking), zabraňuje zneužitiu MIME typov, a kontroluje odosielanie Referer informácií.',
+
+    // Appearance
+    'custom_login_logo_label'       => 'Vlastné logo na prihlasovacej stránke',
+    'custom_login_logo_desc'        => 'Nahradí predvolené WordPress logo vlastným obrázkom.',
+    'custom_login_logo_url_label'   => 'URL loga',
+    'custom_login_logo_url_desc'    => 'Zadajte URL obrázka alebo vyberte z knižnice médií (odporúčaná šírka: 320 px).',
+
+    // Content
+    'disable_comments_label'    => 'Vypnúť komentáre',
+    'disable_comments_desc'     => 'Vypne komentáre na celom webe, skryje relevantné menu položky a widgety.',
+    'disable_gutenberg_label'   => 'Vypnúť Gutenberg (block editor)',
+    'disable_gutenberg_desc'    => 'Prepne späť na klasický TinyMCE editor pre všetky typy obsahu.',
+
+    // Maintenance
+    'maintenance_mode_label'        => 'Zapnúť maintenance mode',
+    'maintenance_mode_desc'         => 'Zobrazí návštevníkom stránku údržby (HTTP 503). Administrátori vidia web normálne.',
+    'maintenance_headline_label'    => 'Nadpis stránky',
+    'maintenance_text_label'        => 'Text správy',
+    'maintenance_bg_label'          => 'Farba pozadia',
+    'maintenance_bg_desc'           => 'Farba pozadia stránky údržby (hex kód, napr. #1a1a2e).',
+
+    // White Label
+    'hide_wp_logo_label'        => 'Skryť WP logo z admin lišty',
+    'hide_wp_logo_desc'         => 'Odstráni logo WordPress z hornej administračnej lišty.',
+    'admin_footer_text_label'   => 'Text v päte administrácie',
+    'admin_footer_text_desc'    => 'Nahradí predvolený text "Thank you for creating with WordPress". Podporuje HTML – môžete vložiť odkaz alebo telefónne číslo, napr. <code>&lt;a href="tel:+421900123456"&gt;+421 900 123 456&lt;/a&gt;</code>.',
+    'hide_howdy_label'          => 'Skryť "Howdy,"',
+    'hide_howdy_desc'           => 'Odstráni text "Howdy," pred menom prihláseného používateľa v admin lište.',
+    'hide_frontend_bar_label'   => 'Skryť admin lištu na fronte pre bežných používateľov',
+    'hide_frontend_bar_desc'    => 'Skryje admin lištu na frontende pre všetkých okrem administrátorov.',
+
+    // Scripts
+    'gtm_id_label'      => 'Google Tag Manager ID',
+    'gtm_id_desc'       => 'Google Tag Manager je "kontajner" pre sledovacie skripty. Jeden GTM kód na webe → cez GTM rozhranie potom pridáte GA4, Facebook Pixel, Microsoft Clarity a iné bez zmeny kódu webu. Zadajte GTM-XXXXXXX ID. Ak používate priamo GA4 bez GTM, toto pole nechajte prázdne.',
+    'head_code_label'   => 'Vlastný kód do &lt;head&gt;',
+    'head_code_desc'    => 'HTML alebo JavaScript kód vložený tesne pred &lt;/head&gt;.',
+    'footer_code_label' => 'Vlastný kód pred &lt;/body&gt;',
+    'footer_code_desc'  => 'HTML alebo JavaScript kód vložený tesne pred &lt;/body&gt;.',
+
+    // Performance
+    'heartbeat_label'               => 'Heartbeat API',
+    'heartbeat_desc'                => 'WordPress každých 15–60 sekúnd pošle tichú požiadavku na server (zabezpečuje automatické ukladanie v editore). Pre prezentačné weby stačí nastaviť na 60 sekúnd – nepoznáte rozdiel, ale server bude menej zaťažený.',
+    'heartbeat_default'             => 'Predvolené (nekontrolovať)',
+    'heartbeat_off'                 => 'Vypnuté',
+    'heartbeat_slow60'              => 'Každých 60 sekúnd',
+    'heartbeat_slow120'             => 'Každých 120 sekúnd',
+    'remove_query_strings_label'    => 'Odstrániť ?ver= z URL skriptov a štýlov',
+    'remove_query_strings_desc'     => 'Odstráni query string verzie z URL CSS a JS súborov – zlepšuje kompatibilitu s CDN a cachingom.',
+    'disable_big_image_label'       => 'Vypnúť automatické zmenšovanie veľkých obrázkov',
+    'disable_big_image_desc'        => 'Zabraňuje WordPress automaticky zmenšovať obrázky väčšie ako 2560 px pri nahrávaní.',
+    'revisions_limit_label'         => 'Maximálny počet revízií príspevkov',
+    'revisions_limit_desc'          => 'Obmedzí počet uložených revízií príspevku. Predvolene 5. 0 = neobmedzene (predvolené WP). -1 = revízie úplne vypnuté.',
+
+    'disable_dashicons_label'       => 'Vypnúť Dashicons pre neprihlásených',
+    'disable_dashicons_desc'        => 'Odstráni WordPress ikonový font (Dashicons) z frontendu pre návštevníkov. Ušetrí ~30 KB na každej stránke.',
+    'jpeg_quality_label'            => 'Kvalita kompresie JPEG obrázkov',
+    'jpeg_quality_desc'             => 'Výsledná kvalita JPEG obrázkov pri nahrávaní a regenerovaní (0–100). WordPress default je 82. Odporúčané: 85–90 pre lepšiu kvalitu, 75 pre menšie súbory.',
+
+    // Warnings (admin bar + menu badge)
+    'warning_noindex'      => 'Noindex je zapnutý',
+    'warning_maintenance'  => 'Maintenance mode je zapnutý',
+
+    // Dashboard widget
+    'widget_settings_link'   => 'Nastavenia pluginu',
+    'widget_configure'       => 'Nastaviť',
+    'widget_scripts_title'   => 'Skripty a sledovanie',
+    'widget_gtm'             => 'GTM',
+    'widget_not_set'         => 'nie je nastavený',
+    'widget_head_code'       => 'Vlastný head kód',
+    'widget_footer_code'     => 'Vlastný footer kód',
+    'widget_yes'             => 'áno',
+    'widget_no'              => 'nie',
+    'widget_warning_noindex'      => '⚠ NOINDEX JE ZAPNUTÝ – stránky nie sú indexované!',
+    'widget_warning_maintenance'  => '⚠ MAINTENANCE MODE JE ZAPNUTÝ – web nie je dostupný!',
+
+    // Tools
+    'tools_export_title'        => 'Export nastavení',
+    'tools_export_desc'         => 'Skopírujte JSON nižšie pre zálohu alebo import na iný web.',
+    'tools_export_download'     => 'Stiahnuť ako súbor',
+    'tools_import_title'        => 'Import nastavení',
+    'tools_import_desc'         => 'Vložte JSON exportovaný z iného WP Základ webu a kliknite Importovať.',
+    'tools_import_placeholder'  => 'Vložte JSON sem…',
+    'import_button'             => 'Importovať',
+    'import_success'            => 'Nastavenia boli úspešne importované.',
+    'import_error'              => 'Chyba importu: neplatný JSON alebo nekompatibilné dáta.',
+    'tools_reset_title'         => 'Reset nastavení',
+    'tools_reset_desc'          => 'Obnoví všetky nastavenia na predvolené hodnoty. Táto akcia je nevratná.',
+    'reset_button'              => 'Reset na predvolené',
+    'reset_confirm'             => 'Naozaj chcete obnoviť všetky nastavenia na predvolené hodnoty? Táto akcia je nevratná.',
+    'reset_success'             => 'Nastavenia boli obnovené na predvolené hodnoty.',
+    'tools_transients_title'    => 'Vymazať transienty',
+    'tools_transients_desc'     => 'Odstráni všetky transienty (dočasné dáta) z databázy WordPress.',
+    'flush_transients_btn'      => 'Vymazať všetky transienty',
+    'flush_transients_confirm'  => 'Naozaj chcete vymazať všetky transienty?',
+    'flush_transients_success'  => 'Transienty boli úspešne vymazané.',
+    'tools_sysinfo_title'       => 'Systémové informácie',
+    'sysinfo_wp_version'        => 'WP verzia',
+    'sysinfo_php_version'       => 'PHP verzia',
+    'sysinfo_theme'             => 'Aktívna téma',
+    'sysinfo_active_plugins'    => 'Aktívne pluginy',
+    'sysinfo_db_revisions'      => 'Revízie v databáze',
+    'sysinfo_db_transients'     => 'Transienty v databáze',
+    'sysinfo_memory_limit'      => 'PHP Memory Limit',
+    'sysinfo_max_upload'        => 'Max. veľkosť nahrávaného súboru',
+
+    // Admin Menu Manager
+    'admin_menu_order_title'    => 'Poradie bočného menu',
+    'admin_menu_order_desc'     => 'Presuň položky myšou pre zmenu poradia. Po uložení sa poradie aplikuje na admin panel.',
+    'admin_menu_toolbar_title'  => 'Rýchle odkazy (admin lišta)',
+    'admin_menu_toolbar_desc'   => 'Zadaj URL, plugin ju automaticky skráti na relatívnu cestu. Odkazy sa zobrazia pod blesk ikonou v admin lište.',
+    'admin_menu_toolbar_name'   => 'Názov',
+    'admin_menu_toolbar_url'    => 'URL',
+
+    // Plugin list
+    'plugin_settings_link'      => 'Nastavenia',
+    'plugin_active_features'    => '%d aktívnych funkcií',
+
+    // Optimization – nové
+    'clean_head_label'               => 'Vyčistiť HTML hlavičku',
+    'clean_head_desc'                => 'Odstráni nepotrebné linky z &lt;head&gt;: RSD, WLW Manifest, skrátené URL a REST API odkaz.',
+    'block_update_emails_label'      => 'Blokovať update emaily',
+    'block_update_emails_desc'       => 'Zastaví automaticky odosielané emaily o aktualizáciách WordPress jadra, pluginov a tém.',
+    'lazy_load_iframes_label'        => 'Lazy load pre iframes a videá',
+    'lazy_load_iframes_desc'         => 'Pridá atribút loading="lazy" na všetky iframes v obsahu príspevkov – zrýchli načítanie stránok s vloženými videami.',
+
+    // Security – nové
+    'hide_updates_label'             => 'Skryť aktualizácie pre klientov',
+    'hide_updates_desc'              => 'Skryje upozornenia na aktualizácie a stránku aktualizácií pre všetkých okrem správcov webu.',
+
+    // Appearance – nové
+    'clean_dashboard_label'          => 'Odstrániť predvolené dashboard widgety',
+    'clean_dashboard_desc'           => 'Odstráni štandardné WordPress widgety z administračného dashboardu (novinky, rýchle publikovanie, vitajte).',
+    'hide_admin_clients_label'       => 'Skryť admin menu pre klientov',
+    'hide_admin_clients_desc'        => 'Skryje bočné admin menu a admin lištu pre všetkých okrem správcov webu pomocou CSS.',
+    'colored_statuses_label'         => 'Farebné stavy príspevkov',
+    'colored_statuses_desc'          => 'Zafarbí riadky príspevkov v zozname podľa ich stavu (koncept, čaká, súkromné, naplánované).',
+    'color_draft_label'              => 'Farba konceptu',
+    'color_pending_label'            => 'Farba čaká na schválenie',
+    'color_private_label'            => 'Farba súkromného',
+    'color_future_label'             => 'Farba naplánovaného',
+
+    // Content – nové
+    'allow_svg_label'                => 'Povoliť nahrávanie SVG',
+    'allow_svg_desc'                 => 'Umožní nahrávanie SVG obrázkov do knižnice médií. Nebezpečný obsah (skripty, JS handlery) je automaticky odstránený.',
+    'lowercase_filenames_label'      => 'Malé písmená v názvoch súborov',
+    'lowercase_filenames_desc'       => 'Automaticky prevedie názvy nahraných súborov na malé písmená – predchádza problémom s citlivosťou na veľkosť písmen na serveroch.',
+    'year_shortcode_label'           => 'Shortcode [rok] a token $$rok$$',
+    'year_shortcode_desc'            => 'Aktivuje shortcode [rok] a textový token $$rok$$ ktorý všade nahrádza aktuálny rok – ideálne pre copyright texty v päte.',
+    'search_title_shortcode_label'   => 'Shortcode [search_title]',
+    'search_title_shortcode_desc'    => 'Aktivuje shortcode [search_title] zobrazujúci aktuálny vyhľadávací dopyt – použiteľné v nadpise stránky výsledkov.',
+    'clean_block_editor_label'       => 'Odstrániť predvolené vzory blokov',
+    'clean_block_editor_desc'        => 'Odstráni predvolené WordPress vzory (patterns) z editora blokov a zakáže načítanie vzdialených vzorov.',
+    'disable_archives_label'         => 'Presmerovať prílohy a dátumové archívy',
+    'disable_archives_desc'          => 'Presmeruje stránky príloh a dátumové archívy (301) na hlavnú stránku webu.',
+    'clean_archive_titles_label'     => 'Odstrániť prefix z nadpisov archívov',
+    'clean_archive_titles_desc'      => 'Odstráni predponu "Archív:", "Kategória:" a podobné z nadpisov archívnych stránok.',
+    'disable_author_archive_label'   => 'Presmerovať archívy autorov',
+    'disable_author_archive_desc'    => 'Presmeruje stránky archívov autorov (301) na hlavnú stránku webu.',
+
+    // System – widget labels
+    'sysinfo_site_name'              => 'Názov webu',
+    'sysinfo_site_url'               => 'URL adresa',
+    'sysinfo_protocol'               => 'Protokol',
+    'sysinfo_server'                 => 'Server',
+
+    // System
+    'sysinfo_widget_label'           => 'Dashboard widget',
+    'sysinfo_widget_desc'            => 'Zobrazí WP Základ informačný widget na administračnom dashboarde.',
+    'track_last_login_label'         => 'Sledovať posledné prihlásenie',
+    'track_last_login_desc'          => 'Uloží čas posledného prihlásenia každého používateľa a zobrazí ho ako stĺpec v zozname používateľov.',
+    'last_login_column'              => 'Posledné prihlásenie',
+    'never_logged_in'                => 'Nikdy',
+];

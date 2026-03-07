@@ -1,0 +1,235 @@
+<?php
+return [
+    // Admin UI
+    'page_title'              => 'WP Základ – Settings',
+    'menu_title'              => 'WP Základ',
+    'save_button'             => 'Save Settings',
+    'saved_notice'            => 'Settings saved.',
+    'lang_label'              => 'Language',
+    'search_placeholder'      => 'Search setting…',
+    'badge_recommended'       => '✓ Recommended',
+    'select_image'            => 'Select Image',
+    'remove_image'            => 'Remove',
+
+    // Tabs
+    'tab_optimization'  => 'Optimization',
+    'tab_seo'           => 'SEO',
+    'tab_security'      => 'Security',
+    'tab_appearance'    => 'Appearance',
+    'tab_content'       => 'Content & Media',
+    'tab_maintenance'   => 'Maintenance',
+    'tab_whitelabel'    => 'White Label',
+    'tab_scripts'       => 'Scripts',
+    'tab_performance'   => 'Performance',
+    'tab_tools'         => 'Tools',
+    'tab_admin_menu'    => 'Admin Menu',
+    'tab_system'        => 'System',
+
+    // Optimization
+    'disable_emoji_label'            => 'Disable Emoji Scripts',
+    'disable_emoji_desc'             => 'Removes emoji JavaScript and CSS styles from all pages.',
+    'disable_embeds_label'           => 'Disable oEmbed / Embeds',
+    'disable_embeds_desc'           => 'WordPress can automatically turn a URL into an embedded video or post – just paste a YouTube link on its own line. <strong>If you embed YouTube videos or social media on your site, leave this off.</strong> Only enable it if you know you never need embeds (e.g. a pure brochure site with no video content).',
+    'remove_rss_label'               => 'Remove RSS Feeds',
+    'remove_rss_desc'                => 'Removes RSS and Atom feeds from the site and HTML head.',
+    'disable_xmlrpc_label'           => 'Disable XML-RPC',
+    'disable_xmlrpc_desc'            => 'Blocks the XML-RPC interface which can be exploited for brute-force attacks.',
+    'remove_jquery_migrate_label'    => 'Remove jQuery Migrate',
+    'remove_jquery_migrate_desc'     => 'Removes the legacy jQuery Migrate script from the frontend.',
+    'disable_self_pingbacks_label'   => 'Disable Self-Pingbacks',
+    'disable_self_pingbacks_desc'    => 'WordPress automatically "pings" your own pages when you link from one post to another on the same site. This creates unnecessary notifications and database entries – pointless for presentation websites.',
+
+    // SEO
+    'discourage_indexing_label' => 'Discourage Search Engine Indexing',
+    'discourage_indexing_desc'  => 'Tells search engines not to index this site (sets blog_public = 0, same as Settings → Reading → "Discourage search engines from indexing this site"). <strong>Use only during development – disable on production sites.</strong>',
+    'noindex_search_label'      => 'Noindex Search Results',
+    'noindex_search_desc'       => 'Adds a noindex meta tag to internal search result pages.',
+    'noindex_archives_label'    => 'Noindex Archives',
+    'noindex_archives_desc'     => 'Adds noindex tag to category, tag, and date archive pages.',
+    'remove_feed_links_label'   => 'Remove Feed Links from &lt;head&gt;',
+    'remove_feed_links_desc'    => 'Removes auto-generated &lt;link rel="alternate"&gt; feed tags from the HTML head.',
+
+    // Security
+    'hide_wp_version_label'         => 'Hide WP and PHP Version',
+    'hide_wp_version_desc'          => 'Removes the WordPress version number from &lt;head&gt; and RSS feeds. Also hides the PHP version by removing the X-Powered-By header.',
+    'disable_file_edit_label'       => 'Disable File Editor in Admin',
+    'disable_file_edit_desc'        => 'Hides the theme and plugin editor – recommended for production sites.',
+    'disable_rest_unauth_label'     => 'Disable REST API for Unauthenticated Users',
+    'disable_rest_unauth_desc'      => 'The REST API is the interface WordPress uses to communicate with other applications. This blocks the entire API for visitors who are not logged in. <strong>Note:</strong> may break Contact Form 7, Elementor, and other plugins that use the REST API. Hiding only the users endpoint (below) is the safer choice.',
+    'disable_user_rest_label'       => 'Hide Users via REST API and Author Archives',
+    'disable_user_rest_desc'        => 'The /wp/v2/users endpoint publicly exposes admin login names, and author archives reveal them further. Closes both without affecting other plugins.',
+    'security_headers_label'        => 'Security HTTP Headers',
+    'security_headers_desc'         => 'Adds three protective headers: prevents embedding the site in iframes (clickjacking), prevents MIME-type sniffing, and controls Referer information sent to other sites.',
+
+    // Appearance
+    'custom_login_logo_label'       => 'Custom Login Page Logo',
+    'custom_login_logo_desc'        => 'Replaces the default WordPress logo with a custom image.',
+    'custom_login_logo_url_label'   => 'Logo URL',
+    'custom_login_logo_url_desc'    => 'Enter an image URL or select from the media library (recommended width: 320 px).',
+
+    // Content
+    'disable_comments_label'    => 'Disable Comments',
+    'disable_comments_desc'     => 'Disables comments sitewide and hides related menu items and widgets.',
+    'disable_gutenberg_label'   => 'Disable Gutenberg (Block Editor)',
+    'disable_gutenberg_desc'    => 'Switches back to the classic TinyMCE editor for all post types.',
+
+    // Maintenance
+    'maintenance_mode_label'        => 'Enable Maintenance Mode',
+    'maintenance_mode_desc'         => 'Shows visitors a maintenance page (HTTP 503). Admins see the site normally.',
+    'maintenance_headline_label'    => 'Page Headline',
+    'maintenance_text_label'        => 'Message Text',
+    'maintenance_bg_label'          => 'Background Color',
+    'maintenance_bg_desc'           => 'Maintenance page background color (hex code, e.g. #1a1a2e).',
+
+    // White Label
+    'hide_wp_logo_label'        => 'Hide WP Logo from Admin Bar',
+    'hide_wp_logo_desc'         => 'Removes the WordPress logo from the admin bar.',
+    'admin_footer_text_label'   => 'Admin Footer Text',
+    'admin_footer_text_desc'    => 'Replaces the default "Thank you for creating with WordPress" text. HTML is supported – you can add links or a phone number, e.g. <code>&lt;a href="tel:+421900123456"&gt;+421 900 123 456&lt;/a&gt;</code>.',
+    'hide_howdy_label'          => 'Hide "Howdy,"',
+    'hide_howdy_desc'           => 'Removes the "Howdy," greeting before the username in the admin bar.',
+    'hide_frontend_bar_label'   => 'Hide Admin Bar on Frontend for Non-Admins',
+    'hide_frontend_bar_desc'    => 'Hides the admin bar on the frontend for everyone except administrators.',
+
+    // Scripts
+    'gtm_id_label'      => 'Google Tag Manager ID',
+    'gtm_id_desc'       => 'Google Tag Manager is a "container" for tracking scripts. One GTM code on your site → then add GA4, Facebook Pixel, Microsoft Clarity and others through the GTM interface without touching your site code. Enter your GTM-XXXXXXX ID. If you use GA4 directly without GTM, leave this blank.',
+    'head_code_label'   => 'Custom Code in &lt;head&gt;',
+    'head_code_desc'    => 'HTML or JavaScript code inserted just before &lt;/head&gt;.',
+    'footer_code_label' => 'Custom Code before &lt;/body&gt;',
+    'footer_code_desc'  => 'HTML or JavaScript code inserted just before &lt;/body&gt;.',
+
+    // Performance
+    'heartbeat_label'               => 'Heartbeat API',
+    'heartbeat_desc'                => 'WordPress sends a silent request to the server every 15–60 seconds (powers auto-save in the editor). For presentation sites, setting this to 60 seconds is enough – you won\'t notice the difference, but the server will be less loaded.',
+    'heartbeat_default'             => 'Default (no change)',
+    'heartbeat_off'                 => 'Disabled',
+    'heartbeat_slow60'              => 'Every 60 seconds',
+    'heartbeat_slow120'             => 'Every 120 seconds',
+    'remove_query_strings_label'    => 'Remove ?ver= from CSS/JS URLs',
+    'remove_query_strings_desc'     => 'Removes version query strings from stylesheet and script URLs – improves CDN and cache compatibility.',
+    'disable_big_image_label'       => 'Disable Large Image Auto-Scaling',
+    'disable_big_image_desc'        => 'Prevents WordPress from automatically downscaling images larger than 2560 px on upload.',
+    'revisions_limit_label'         => 'Post Revisions Limit',
+    'revisions_limit_desc'          => 'Limits saved revisions per post. Default is 5. 0 = unlimited (WP default). -1 = revisions fully disabled.',
+
+    'disable_dashicons_label'       => 'Disable Dashicons for Visitors',
+    'disable_dashicons_desc'        => 'Removes the WordPress icon font (Dashicons) from the frontend for non-logged-in visitors. Saves ~30 KB on every page load.',
+    'jpeg_quality_label'            => 'JPEG Image Compression Quality',
+    'jpeg_quality_desc'             => 'Output quality for JPEG images on upload and regeneration (0–100). WordPress default is 82. Recommended: 85–90 for better quality, 75 for smaller files.',
+
+    // Warnings (admin bar + menu badge)
+    'warning_noindex'      => 'Noindex is active',
+    'warning_maintenance'  => 'Maintenance mode is active',
+
+    // Dashboard widget
+    'widget_settings_link'   => 'Plugin Settings',
+    'widget_configure'       => 'Configure',
+    'widget_scripts_title'   => 'Scripts & Tracking',
+    'widget_gtm'             => 'GTM',
+    'widget_not_set'         => 'not set',
+    'widget_head_code'       => 'Custom head code',
+    'widget_footer_code'     => 'Custom footer code',
+    'widget_yes'             => 'yes',
+    'widget_no'              => 'no',
+    'widget_warning_noindex'      => '⚠ NOINDEX IS ACTIVE – pages are not being indexed!',
+    'widget_warning_maintenance'  => '⚠ MAINTENANCE MODE IS ACTIVE – site is not accessible!',
+
+    // Tools
+    'tools_export_title'        => 'Export Settings',
+    'tools_export_desc'         => 'Copy the JSON below for backup or import on another site.',
+    'tools_export_download'     => 'Download as File',
+    'tools_import_title'        => 'Import Settings',
+    'tools_import_desc'         => 'Paste JSON exported from another WP Základ site and click Import.',
+    'tools_import_placeholder'  => 'Paste JSON here…',
+    'import_button'             => 'Import',
+    'import_success'            => 'Settings imported successfully.',
+    'import_error'              => 'Import error: invalid JSON or incompatible data.',
+    'tools_reset_title'         => 'Reset Settings',
+    'tools_reset_desc'          => 'Restores all settings to their default values. This action cannot be undone.',
+    'reset_button'              => 'Reset to Defaults',
+    'reset_confirm'             => 'Are you sure you want to reset all settings to defaults? This cannot be undone.',
+    'reset_success'             => 'Settings have been reset to defaults.',
+    'tools_transients_title'    => 'Flush Transients',
+    'tools_transients_desc'     => 'Removes all transients (temporary data) from the WordPress database.',
+    'flush_transients_btn'      => 'Flush All Transients',
+    'flush_transients_confirm'  => 'Are you sure you want to flush all transients?',
+    'flush_transients_success'  => 'Transients flushed successfully.',
+    'tools_sysinfo_title'       => 'System Information',
+    'sysinfo_wp_version'        => 'WP Version',
+    'sysinfo_php_version'       => 'PHP Version',
+    'sysinfo_theme'             => 'Active Theme',
+    'sysinfo_active_plugins'    => 'Active Plugins',
+    'sysinfo_db_revisions'      => 'Revisions in DB',
+    'sysinfo_db_transients'     => 'Transients in DB',
+    'sysinfo_memory_limit'      => 'PHP Memory Limit',
+    'sysinfo_max_upload'        => 'Max Upload Size',
+
+    // Admin Menu Manager
+    'admin_menu_order_title'    => 'Sidebar Menu Order',
+    'admin_menu_order_desc'     => 'Drag and drop items to reorder. Save to apply the new order to your admin panel.',
+    'admin_menu_toolbar_title'  => 'Quick Links (Admin Bar)',
+    'admin_menu_toolbar_desc'   => 'Enter a URL and the plugin will automatically strip it to a relative path. Links appear under the lightning bolt icon in the admin bar.',
+    'admin_menu_toolbar_name'   => 'Name',
+    'admin_menu_toolbar_url'    => 'URL',
+
+    // Plugin list
+    'plugin_settings_link'      => 'Settings',
+    'plugin_active_features'    => '%d active features',
+
+    // Optimization – new
+    'clean_head_label'               => 'Clean HTML Head',
+    'clean_head_desc'                => 'Removes unnecessary tags from &lt;head&gt;: RSD link, WLW Manifest, shortlink, and REST API link.',
+    'block_update_emails_label'      => 'Block Update Emails',
+    'block_update_emails_desc'       => 'Stops automatically sent emails about WordPress core, plugin, and theme updates.',
+    'lazy_load_iframes_label'        => 'Lazy Load Iframes & Videos',
+    'lazy_load_iframes_desc'         => 'Adds loading="lazy" to all iframes in post content – speeds up page load for pages with embedded videos.',
+
+    // Security – new
+    'hide_updates_label'             => 'Hide Updates for Clients',
+    'hide_updates_desc'              => 'Hides update notifications and the updates page for all users except site administrators.',
+
+    // Appearance – new
+    'clean_dashboard_label'          => 'Remove Default Dashboard Widgets',
+    'clean_dashboard_desc'           => 'Removes standard WordPress widgets from the admin dashboard (news, quick draft, welcome panel).',
+    'hide_admin_clients_label'       => 'Hide Admin Menu for Clients',
+    'hide_admin_clients_desc'        => 'Hides the sidebar menu and admin bar for everyone except site administrators using CSS.',
+    'colored_statuses_label'         => 'Colored Post Statuses',
+    'colored_statuses_desc'          => 'Color-codes post rows in the list view based on their status (draft, pending, private, scheduled).',
+    'color_draft_label'              => 'Draft Color',
+    'color_pending_label'            => 'Pending Review Color',
+    'color_private_label'            => 'Private Color',
+    'color_future_label'             => 'Scheduled Color',
+
+    // Content – new
+    'allow_svg_label'                => 'Allow SVG File Uploads',
+    'allow_svg_desc'                 => 'Enables SVG image uploads to the media library. Dangerous content (scripts, JS handlers) is automatically stripped.',
+    'lowercase_filenames_label'      => 'Lowercase Filenames',
+    'lowercase_filenames_desc'       => 'Automatically converts uploaded filenames to lowercase – prevents case-sensitivity issues on servers.',
+    'year_shortcode_label'           => 'Shortcode [rok] and token $$rok$$',
+    'year_shortcode_desc'            => 'Enables the [rok] shortcode and $$rok$$ text token that replaces the current year everywhere – ideal for footer copyright text.',
+    'search_title_shortcode_label'   => 'Shortcode [search_title]',
+    'search_title_shortcode_desc'    => 'Enables the [search_title] shortcode that outputs the current search query – useful in search results page headings.',
+    'clean_block_editor_label'       => 'Remove Default Block Patterns',
+    'clean_block_editor_desc'        => 'Removes default WordPress patterns from the block editor and disables remote pattern loading.',
+    'disable_archives_label'         => 'Redirect Attachment & Date Archives',
+    'disable_archives_desc'          => 'Redirects attachment pages and date-based archives (301) to the site homepage.',
+    'clean_archive_titles_label'     => 'Remove Archive Title Prefix',
+    'clean_archive_titles_desc'      => 'Removes prefixes like "Archive:", "Category:", etc. from archive page titles.',
+    'disable_author_archive_label'   => 'Redirect Author Archives',
+    'disable_author_archive_desc'    => 'Redirects author archive pages (301) to the site homepage.',
+
+    // System – widget labels
+    'sysinfo_site_name'              => 'Site Name',
+    'sysinfo_site_url'               => 'Site URL',
+    'sysinfo_protocol'               => 'Protocol',
+    'sysinfo_server'                 => 'Server',
+
+    // System
+    'sysinfo_widget_label'           => 'Dashboard Widget',
+    'sysinfo_widget_desc'            => 'Shows the WP Základ info widget on the main admin dashboard.',
+    'track_last_login_label'         => 'Track Last Login',
+    'track_last_login_desc'          => 'Records the last login time for each user and shows it as a column in the Users list.',
+    'last_login_column'              => 'Last Login',
+    'never_logged_in'                => 'Never',
+];

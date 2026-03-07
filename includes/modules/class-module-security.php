@@ -14,6 +14,8 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             'wpzaklad_disable_user_rest'         => 0,
             'wpzaklad_security_headers'          => 0,
             'wpzaklad_hide_updates_for_clients'  => 0,
+            'wpzaklad_hide_login_errors'         => 0,
+            'wpzaklad_block_author_scan'         => 0,
         ];
     }
 
@@ -25,6 +27,8 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             ['key' => 'wpzaklad_disable_user_rest',        'type' => 'checkbox', 'label' => wpbl_t('disable_user_rest_label'),   'desc' => wpbl_t('disable_user_rest_desc'),   'recommended' => true],
             ['key' => 'wpzaklad_security_headers',         'type' => 'checkbox', 'label' => wpbl_t('security_headers_label'),    'desc' => wpbl_t('security_headers_desc'),    'recommended' => true],
             ['key' => 'wpzaklad_hide_updates_for_clients', 'type' => 'checkbox', 'label' => wpbl_t('hide_updates_label'),        'desc' => wpbl_t('hide_updates_desc')],
+            ['key' => 'wpzaklad_hide_login_errors',        'type' => 'checkbox', 'label' => wpbl_t('hide_login_errors_label'),   'desc' => wpbl_t('hide_login_errors_desc'),   'recommended' => true],
+            ['key' => 'wpzaklad_block_author_scan',        'type' => 'checkbox', 'label' => wpbl_t('block_author_scan_label'),   'desc' => wpbl_t('block_author_scan_desc'),   'recommended' => true],
         ];
     }
 
@@ -56,6 +60,20 @@ class WPBL_Module_Security extends WPBL_Module_Base {
 
         if ($this->get('wpzaklad_security_headers')) {
             add_action('send_headers', [$this, 'send_security_headers']);
+        }
+
+        if ($this->get('wpzaklad_hide_login_errors')) {
+            add_filter('login_errors', fn() => '<strong>Chyba:</strong> Nesprávne prihlasovacie údaje.');
+            add_filter('login_shake_error_codes', '__return_empty_array');
+        }
+
+        if ($this->get('wpzaklad_block_author_scan')) {
+            add_action('template_redirect', function () {
+                if (!is_admin() && isset($_GET['author'])) {
+                    wp_redirect(home_url('/'), 301);
+                    exit;
+                }
+            });
         }
     }
 

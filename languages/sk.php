@@ -178,6 +178,8 @@ return [
     'plugin_active_features'    => '%d aktívnych funkcií',
 
     // Optimization – nové
+    'disable_gravatars_label'        => 'Vypnúť Gravatary',
+    'disable_gravatars_desc'         => 'Gravatary načítavajú profilové obrázky z externého servera gravatar.com – GDPR problém a zbytočný HTTP request. Vypnutím sa avatary jednoducho nezobrazujú.',
     'clean_head_label'               => 'Vyčistiť HTML hlavičku',
     'clean_head_desc'                => 'Odstráni nepotrebné linky z &lt;head&gt;: RSD, WLW Manifest, skrátené URL a REST API odkaz.',
     'block_update_emails_label'      => 'Blokovať update emaily',
@@ -188,6 +190,10 @@ return [
     // Security – nové
     'hide_updates_label'             => 'Skryť aktualizácie pre klientov',
     'hide_updates_desc'              => 'Skryje upozornenia na aktualizácie a stránku aktualizácií pre všetkých okrem správcov webu.',
+    'hide_login_errors_label'        => 'Skryť chybové hlásenia pri prihlásení',
+    'hide_login_errors_desc'         => 'WordPress predvolene zobrazuje konkrétnu chybu (napr. "Nesprávne heslo") – z tej útočník zistí, že používateľské meno existuje. Toto nastavenie vráti vždy rovnakú generickú správu.',
+    'block_author_scan_label'        => 'Blokovať skenovanie autorov cez URL',
+    'block_author_scan_desc'         => 'Požiadavky s parametrom /?author=1 presmerujú na /author/admin/ a odhalia prihlasovacie meno administrátora. Toto nastavenie ich okamžite presmeruje na hlavnú stránku.',
 
     // Appearance – nové
     'clean_dashboard_label'          => 'Odstrániť predvolené dashboard widgety',

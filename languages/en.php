@@ -178,6 +178,8 @@ return [
     'plugin_active_features'    => '%d active features',
 
     // Optimization – new
+    'disable_gravatars_label'        => 'Disable Gravatars',
+    'disable_gravatars_desc'         => 'Gravatars load profile images from the external gravatar.com server – a GDPR concern and an unnecessary HTTP request. Disabling this simply hides avatars.',
     'clean_head_label'               => 'Clean HTML Head',
     'clean_head_desc'                => 'Removes unnecessary tags from &lt;head&gt;: RSD link, WLW Manifest, shortlink, and REST API link.',
     'block_update_emails_label'      => 'Block Update Emails',
@@ -188,6 +190,10 @@ return [
     // Security – new
     'hide_updates_label'             => 'Hide Updates for Clients',
     'hide_updates_desc'              => 'Hides update notifications and the updates page for all users except site administrators.',
+    'hide_login_errors_label'        => 'Hide Login Error Messages',
+    'hide_login_errors_desc'         => 'WordPress by default shows specific errors (e.g. "Wrong password") – attackers can use this to confirm that a username exists. This setting always returns a generic message instead.',
+    'block_author_scan_label'        => 'Block Author Scan via URL',
+    'block_author_scan_desc'         => 'Requests with /?author=1 redirect to /author/admin/ and reveal the admin login name. This setting immediately redirects them to the homepage instead.',
 
     // Appearance – new
     'clean_dashboard_label'          => 'Remove Default Dashboard Widgets',

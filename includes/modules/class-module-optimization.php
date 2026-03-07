@@ -17,6 +17,7 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
             'wpzaklad_clean_head'             => 0,
             'wpzaklad_block_update_emails'    => 0,
             'wpzaklad_lazy_load_iframes'      => 0,
+            'wpzaklad_disable_gravatars'      => 0,
         ];
     }
 
@@ -31,6 +32,7 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
             ['key' => 'wpzaklad_clean_head',             'type' => 'checkbox', 'label' => wpbl_t('clean_head_label'),             'desc' => wpbl_t('clean_head_desc'),             'recommended' => true],
             ['key' => 'wpzaklad_block_update_emails',    'type' => 'checkbox', 'label' => wpbl_t('block_update_emails_label'),    'desc' => wpbl_t('block_update_emails_desc'),    'recommended' => true],
             ['key' => 'wpzaklad_lazy_load_iframes',      'type' => 'checkbox', 'label' => wpbl_t('lazy_load_iframes_label'),      'desc' => wpbl_t('lazy_load_iframes_desc')],
+            ['key' => 'wpzaklad_disable_gravatars',      'type' => 'checkbox', 'label' => wpbl_t('disable_gravatars_label'),      'desc' => wpbl_t('disable_gravatars_desc')],
         ];
     }
 
@@ -63,6 +65,9 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
         if ($this->get('wpzaklad_lazy_load_iframes')) {
             add_filter('the_content', [$this, 'lazy_load_iframes']);
             add_filter('oembed_result', [$this, 'lazy_load_iframes']);
+        }
+        if ($this->get('wpzaklad_disable_gravatars')) {
+            add_filter('option_show_avatars', '__return_false');
         }
     }
 

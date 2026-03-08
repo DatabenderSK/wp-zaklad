@@ -173,9 +173,50 @@ class WPBL_Admin_UI {
             true
         );
 
+        $recommended_keys = [];
+        foreach ($this->modules as $module) {
+            foreach ($module->get_fields() as $field) {
+                if (!empty($field['recommended'])) {
+                    $recommended_keys[] = $field['key'];
+                }
+            }
+        }
+
+        // "Moje" preset – user's personal defaults (checkboxes that should be ON)
+        $mine_keys = [
+            'wpzaklad_disable_emoji',
+            'wpzaklad_disable_xmlrpc',
+            'wpzaklad_remove_jquery_migrate',
+            'wpzaklad_disable_self_pingbacks',
+            'wpzaklad_clean_head',
+            'wpzaklad_block_update_emails',
+            'wpzaklad_disable_gravatars',
+            'wpzaklad_noindex_search',
+            'wpzaklad_hide_wp_version',
+            'wpzaklad_disable_user_rest',
+            'wpzaklad_security_headers',
+            'wpzaklad_hide_login_errors',
+            'wpzaklad_block_author_scan',
+            'wpzaklad_custom_login_logo',
+            'wpzaklad_clean_dashboard',
+            'wpzaklad_colored_post_statuses',
+            'wpzaklad_disable_comments',
+            'wpzaklad_allow_svg',
+            'wpzaklad_lowercase_filenames',
+            'wpzaklad_year_shortcode',
+            'wpzaklad_search_title_shortcode',
+            'wpzaklad_hide_wp_logo',
+            'wpzaklad_hide_howdy',
+            'wpzaklad_disable_dashicons',
+            'wpzaklad_sysinfo_widget',
+        ];
+
         wp_localize_script('wpbl-admin', 'wpbl', [
-            'resetConfirm' => wpbl_t('reset_confirm'),
-            'flushConfirm' => wpbl_t('flush_transients_confirm'),
+            'resetConfirm'    => wpbl_t('reset_confirm'),
+            'flushConfirm'    => wpbl_t('flush_transients_confirm'),
+            'recommended'     => $recommended_keys,
+            'mine'            => $mine_keys,
+            'presetApplied'   => wpbl_t('preset_applied'),
         ]);
     }
 
@@ -209,6 +250,32 @@ class WPBL_Admin_UI {
             case 'flush_transients':
                 check_admin_referer('wpbl_flush', 'wpbl_nonce');
                 $this->process_flush();
+                break;
+
+            case 'db_clean':
+                check_admin_referer('wpbl_db', 'wpbl_nonce');
+                $type = sanitize_key($_POST['db_type'] ?? '');
+                WPBL_DB_Optimizer::clean($type);
+                $this->redirect(5);
+                break;
+
+            case 'db_clean_all':
+                check_admin_referer('wpbl_db', 'wpbl_nonce');
+                WPBL_DB_Optimizer::clean_all();
+                $this->redirect(5);
+                break;
+
+            case 'db_optimize':
+                check_admin_referer('wpbl_db', 'wpbl_nonce');
+                WPBL_DB_Optimizer::optimize_tables();
+                $this->redirect(6);
+                break;
+
+            case 'db_schedule':
+                check_admin_referer('wpbl_db', 'wpbl_nonce');
+                $schedule = sanitize_key($_POST['db_schedule_value'] ?? 'disabled');
+                WPBL_DB_Optimizer::set_schedule($schedule);
+                $this->redirect(7);
                 break;
 
             case 'set_lang':
@@ -382,8 +449,41 @@ class WPBL_Admin_UI {
                             </a>
                         </li>
                         <?php endforeach; ?>
+                            <li><a href="#tab-database"><?php echo esc_html(wpbl_t('tab_database')); ?></a></li>
                         <li><a href="#tab-tools"><?php echo esc_html(wpbl_t('tab_tools')); ?></a></li>
                     </ul>
+
+                    <!-- Preset quick-setup -->
+                    <div class="wpbl-preset-bar">
+                        <p class="wpbl-preset-label"><?php echo esc_html(wpbl_t('preset_label')); ?></p>
+                        <select id="wpbl-preset-select">
+                            <option value="">— <?php echo esc_html(wpbl_t('preset_choose')); ?> —</option>
+                            <option value="none"><?php echo esc_html(wpbl_t('preset_none')); ?></option>
+                            <option value="recommended"><?php echo esc_html(wpbl_t('preset_recommended')); ?></option>
+                            <option value="mine"><?php echo esc_html(wpbl_t('preset_mine')); ?></option>
+                        </select>
+                        <button type="button" id="wpbl-preset-apply" class="button button-small"><?php echo esc_html(wpbl_t('preset_apply_btn')); ?></button>
+                    </div>
+
+                    <script>
+                    (function($) {
+                        $('#wpbl-preset-apply').on('click', function() {
+                            var preset = $('#wpbl-preset-select').val();
+                            if (!preset) return;
+
+                            var toEnable = [];
+                            if (preset === 'recommended') toEnable = wpbl.recommended || [];
+                            else if (preset === 'mine')    toEnable = wpbl.mine || [];
+                            // 'none' → toEnable stays []
+
+                            $('#wpbl-settings-form').find('input[type="checkbox"]').each(function() {
+                                this.checked = toEnable.indexOf(this.name) !== -1;
+                            });
+
+                            alert(wpbl.presetApplied || 'Applied.');
+                        });
+                    })(jQuery);
+                    </script>
                 </div>
 
                 <!-- Content -->
@@ -410,6 +510,11 @@ class WPBL_Admin_UI {
                         </div>
                     </form>
 
+                    <!-- Database tab (separate from main form – has its own sub-forms) -->
+                    <div class="wpbl-tab-panel" id="tab-database" style="display:none;">
+                        <?php $this->render_database_tab(); ?>
+                    </div>
+
                     <!-- Tools tab (separate from main form) -->
                     <div class="wpbl-tab-panel" id="tab-tools" style="display:none;">
                         <?php $this->render_tools_tab(); ?>
@@ -427,6 +532,9 @@ class WPBL_Admin_UI {
             '2'            => ['success', wpbl_t('import_success')],
             '3'            => ['success', wpbl_t('reset_success')],
             '4'            => ['success', wpbl_t('flush_transients_success')],
+            '5'            => ['success', wpbl_t('db_cleaned_notice')],
+            '6'            => ['success', wpbl_t('db_optimized_notice')],
+            '7'            => ['success', wpbl_t('db_schedule_saved')],
             'import_error' => ['error',   wpbl_t('import_error')],
         ];
 
@@ -551,28 +659,61 @@ class WPBL_Admin_UI {
     // -------------------------------------------------------------------------
 
     private function render_tools_tab(): void {
-        global $wpdb;
         ?>
-
         <!-- Export -->
         <div class="wpbl-tools-section">
             <h3><?php echo esc_html(wpbl_t('tools_export_title')); ?></h3>
             <p><?php echo esc_html(wpbl_t('tools_export_desc')); ?></p>
             <textarea id="wpbl-export-textarea" class="large-text code" rows="8" readonly onclick="this.select()"><?php echo esc_textarea($this->settings->export()); ?></textarea>
-            <p><button type="button" class="button" id="wpbl-export-download"><?php echo esc_html(wpbl_t('tools_export_download')); ?></button></p>
+            <p style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" class="button" id="wpbl-export-copy"><?php echo esc_html(wpbl_t('portability_copy_btn')); ?></button>
+                <button type="button" class="button" id="wpbl-export-download"><?php echo esc_html(wpbl_t('portability_download_btn')); ?></button>
+            </p>
         </div>
 
         <!-- Import -->
         <div class="wpbl-tools-section">
             <h3><?php echo esc_html(wpbl_t('tools_import_title')); ?></h3>
             <p><?php echo esc_html(wpbl_t('tools_import_desc')); ?></p>
-            <form method="post">
+            <form method="post" id="wpbl-import-form">
                 <?php wp_nonce_field('wpbl_import', 'wpbl_nonce'); ?>
                 <input type="hidden" name="wpbl_action" value="import">
-                <textarea name="wpbl_import_json" class="large-text code" rows="6" placeholder="<?php echo esc_attr(wpbl_t('tools_import_placeholder')); ?>"></textarea>
-                <p><button type="submit" class="button"><?php echo esc_html(wpbl_t('import_button')); ?></button></p>
+                <textarea name="wpbl_import_json" id="wpbl-import-textarea" class="large-text code" rows="6" placeholder="<?php echo esc_attr(wpbl_t('tools_import_placeholder')); ?>"></textarea>
+                <p style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                    <button type="submit" class="button"><?php echo esc_html(wpbl_t('import_button')); ?></button>
+                    <label class="button" for="wpbl-import-file" style="cursor:pointer;"><?php echo esc_html(wpbl_t('portability_upload_btn')); ?></label>
+                    <input type="file" id="wpbl-import-file" accept=".json" style="display:none;">
+                </p>
             </form>
         </div>
+
+        <script>
+        (function() {
+            var exportTA = document.getElementById('wpbl-export-textarea');
+            document.getElementById('wpbl-export-copy').addEventListener('click', function() {
+                exportTA.select(); document.execCommand('copy');
+            });
+            document.getElementById('wpbl-export-download').addEventListener('click', function() {
+                var blob = new Blob([exportTA.value], {type: 'application/json'});
+                var url  = URL.createObjectURL(blob);
+                var a    = document.createElement('a');
+                a.href = url; a.download = 'wpzaklad-settings.json';
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a); URL.revokeObjectURL(url);
+            });
+            document.getElementById('wpbl-import-file').addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function(evt) {
+                    document.getElementById('wpbl-import-textarea').value = evt.target.result;
+                    document.getElementById('wpbl-import-form').submit();
+                };
+                reader.readAsText(file);
+                this.value = '';
+            });
+        })();
+        </script>
 
         <!-- Reset -->
         <div class="wpbl-tools-section">
@@ -584,39 +725,137 @@ class WPBL_Admin_UI {
                 <button type="submit" class="button button-link-delete"><?php echo esc_html(wpbl_t('reset_button')); ?></button>
             </form>
         </div>
+        <?php
+    }
 
-        <!-- Flush transients -->
+    // -------------------------------------------------------------------------
+    // Database tab
+    // -------------------------------------------------------------------------
+
+    private function render_database_tab(): void {
+        ?>
+        <!-- Database optimizer -->
+        <?php $this->render_db_optimizer_section(); ?>
+        <?php
+    }
+
+    // -------------------------------------------------------------------------
+    // Database optimizer section
+    // -------------------------------------------------------------------------
+
+    private function render_db_optimizer_section(): void {
+        $counts   = WPBL_DB_Optimizer::get_counts();
+        $schedule = WPBL_DB_Optimizer::get_schedule();
+
+        $rows = [
+            'revisions'          => wpbl_t('db_revisions'),
+            'auto_drafts'        => wpbl_t('db_auto_drafts'),
+            'trashed_posts'      => wpbl_t('db_trashed_posts'),
+            'spam_comments'      => wpbl_t('db_spam_comments'),
+            'trashed_comments'   => wpbl_t('db_trashed_comments'),
+            'expired_transients' => wpbl_t('db_expired_transients'),
+            'orphan_postmeta'    => wpbl_t('db_orphan_postmeta'),
+        ];
+
+        $any_positive = !empty(array_filter($counts, static fn($c) => $c > 0));
+        ?>
         <div class="wpbl-tools-section">
-            <h3><?php echo esc_html(wpbl_t('tools_transients_title')); ?></h3>
-            <p><?php echo esc_html(wpbl_t('tools_transients_desc')); ?></p>
-            <form method="post" class="wpbl-flush-form">
-                <?php wp_nonce_field('wpbl_flush', 'wpbl_nonce'); ?>
-                <input type="hidden" name="wpbl_action" value="flush_transients">
-                <button type="submit" class="button"><?php echo esc_html(wpbl_t('flush_transients_btn')); ?></button>
+            <h3><?php echo esc_html(wpbl_t('db_optimizer_title')); ?></h3>
+            <p><?php echo esc_html(wpbl_t('db_optimizer_desc')); ?></p>
+
+            <form method="post" id="wpbl-db-form">
+                <?php wp_nonce_field('wpbl_db', 'wpbl_nonce'); ?>
+                <input type="hidden" name="wpbl_action" id="wpbl-db-action" value="db_clean">
+                <input type="hidden" name="db_type"    id="wpbl-db-type"   value="">
+
+                <table class="wpbl-sysinfo wpbl-db-table">
+                    <?php foreach ($rows as $type => $label):
+                        $count = $counts[$type] ?? 0;
+                    ?>
+                    <tr>
+                        <td><?php echo esc_html($label); ?></td>
+                        <td class="wpbl-db-count <?php echo $count > 0 ? 'wpbl-db-count-pos' : ''; ?>">
+                            <?php echo number_format($count); ?>&nbsp;<?php echo esc_html(wpbl_t('db_found')); ?>
+                        </td>
+                        <td>
+                            <button type="button"
+                                class="button button-small wpbl-db-clean-btn"
+                                data-type="<?php echo esc_attr($type); ?>"
+                                data-confirm="<?php echo esc_attr(wpbl_t('db_confirm_single')); ?>"
+                                <?php disabled($count, 0); ?>>
+                                <?php echo esc_html(wpbl_t('db_delete_btn')); ?>
+                            </button>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </table>
+
+                <p style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                    <button type="button" id="wpbl-db-clean-all" class="button"
+                        data-confirm="<?php echo esc_attr(wpbl_t('db_confirm_all')); ?>"
+                        <?php disabled($any_positive, false); ?>>
+                        <?php echo esc_html(wpbl_t('db_clean_all_btn')); ?>
+                    </button>
+                    <button type="button" id="wpbl-db-optimize" class="button"
+                        data-confirm="<?php echo esc_attr(wpbl_t('db_confirm_optimize')); ?>">
+                        <?php echo esc_html(wpbl_t('db_optimize_btn')); ?>
+                    </button>
+                </p>
+            </form>
+
+            <form method="post" style="margin-top:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <?php wp_nonce_field('wpbl_db', 'wpbl_nonce'); ?>
+                <input type="hidden" name="wpbl_action" value="db_schedule">
+                <strong style="font-size:13px;"><?php echo esc_html(wpbl_t('db_schedule_title')); ?>:</strong>
+                <select name="db_schedule_value">
+                    <option value="disabled" <?php selected($schedule, 'disabled'); ?>><?php echo esc_html(wpbl_t('db_schedule_disabled')); ?></option>
+                    <option value="daily"    <?php selected($schedule, 'daily');    ?>><?php echo esc_html(wpbl_t('db_schedule_daily'));    ?></option>
+                    <option value="weekly"   <?php selected($schedule, 'weekly');   ?>><?php echo esc_html(wpbl_t('db_schedule_weekly'));   ?></option>
+                    <option value="monthly"  <?php selected($schedule, 'monthly');  ?>><?php echo esc_html(wpbl_t('db_schedule_monthly'));  ?></option>
+                </select>
+                <button type="submit" class="button"><?php echo esc_html(wpbl_t('db_save_schedule')); ?></button>
+                <?php if ($schedule !== 'disabled'): ?>
+                    <span style="font-size:12px;color:#646970;">
+                        (<?php echo esc_html(wpbl_t('db_next_run')); ?>:
+                        <?php
+                        $next = wp_next_scheduled(WPBL_DB_Optimizer::CRON_HOOK);
+                        echo $next ? esc_html(wp_date(get_option('date_format') . ' ' . get_option('time_format'), $next)) : '–';
+                        ?>)
+                    </span>
+                <?php endif; ?>
             </form>
         </div>
 
-        <!-- System info -->
-        <div class="wpbl-tools-section">
-            <h3><?php echo esc_html(wpbl_t('tools_sysinfo_title')); ?></h3>
-            <?php
-            $theme          = wp_get_theme();
-            $active_plugins = count(get_option('active_plugins', []));
-            $revisions      = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'revision'");
-            $transients     = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '_transient_%' AND option_name NOT LIKE '_transient_timeout_%'");
-            ?>
-            <table class="wpbl-sysinfo">
-                <tr><td><?php echo esc_html(wpbl_t('sysinfo_wp_version')); ?></td><td><?php echo esc_html(get_bloginfo('version')); ?></td></tr>
-                <tr><td><?php echo esc_html(wpbl_t('sysinfo_php_version')); ?></td><td><?php echo esc_html(PHP_VERSION); ?></td></tr>
-                <tr><td><?php echo esc_html(wpbl_t('sysinfo_theme')); ?></td><td><?php echo esc_html($theme->get('Name')); ?> <?php echo esc_html($theme->get('Version')); ?></td></tr>
-                <tr><td><?php echo esc_html(wpbl_t('sysinfo_active_plugins')); ?></td><td><?php echo esc_html($active_plugins); ?></td></tr>
-                <tr><td><?php echo esc_html(wpbl_t('sysinfo_db_revisions')); ?></td><td><?php echo esc_html($revisions); ?></td></tr>
-                <tr><td><?php echo esc_html(wpbl_t('sysinfo_db_transients')); ?></td><td><?php echo esc_html($transients); ?></td></tr>
-                <tr><td><?php echo esc_html(wpbl_t('sysinfo_memory_limit')); ?></td><td><?php echo esc_html(ini_get('memory_limit')); ?></td></tr>
-                <tr><td><?php echo esc_html(wpbl_t('sysinfo_max_upload')); ?></td><td><?php echo esc_html(size_format(wp_max_upload_size())); ?></td></tr>
-            </table>
-        </div>
+        <style>
+        .wpbl-db-table td { vertical-align: middle; padding: 6px 12px 6px 0; }
+        .wpbl-db-table td:first-child { font-size: 13px; color: #1d2327; min-width: 180px; }
+        .wpbl-db-count { font-size: 12px; color: #646970; min-width: 120px; }
+        .wpbl-db-count-pos { color: #b26900; font-weight: 600; }
+        </style>
 
+        <script>
+        jQuery(function($) {
+            $('#wpbl-db-form').find('.wpbl-db-clean-btn').on('click', function() {
+                var msg = $(this).data('confirm');
+                if (!confirm(msg)) return;
+                $('#wpbl-db-action').val('db_clean');
+                $('#wpbl-db-type').val($(this).data('type'));
+                $('#wpbl-db-form').submit();
+            });
+            $('#wpbl-db-clean-all').on('click', function() {
+                var msg = $(this).data('confirm');
+                if (!confirm(msg)) return;
+                $('#wpbl-db-action').val('db_clean_all');
+                $('#wpbl-db-form').submit();
+            });
+            $('#wpbl-db-optimize').on('click', function() {
+                var msg = $(this).data('confirm');
+                if (!confirm(msg)) return;
+                $('#wpbl-db-action').val('db_optimize');
+                $('#wpbl-db-form').submit();
+            });
+        });
+        </script>
         <?php
     }
 }

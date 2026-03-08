@@ -42,13 +42,44 @@ class WPBL_Settings {
         return (bool) update_option(self::OPTION_KEY, $data, false);
     }
 
+    /** Merge partial data into existing settings without replacing unrelated keys. */
+    public function patch(array $data): bool {
+        $this->load();
+        $this->data = array_merge($this->data, $data);
+        return (bool) update_option(self::OPTION_KEY, $this->data, false);
+    }
+
     public function export(): string {
-        return wp_json_encode($this->get_all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) ?: '{}';
+        $data = $this->get_all();
+
+        // Include toolbar quick links in export (stored separately, excluded: menu order)
+        $toolbar = get_option('wpzaklad_admin_menu_toolbar', []);
+        if (!empty($toolbar)) {
+            $data['_toolbar_links'] = $toolbar;
+        }
+
+        return wp_json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) ?: '{}';
     }
 
     public function import(string $json): bool {
         $data = json_decode(wp_unslash($json), true);
         if (!is_array($data)) return false;
+
+        // Restore toolbar quick links if present in the export
+        if (isset($data['_toolbar_links']) && is_array($data['_toolbar_links'])) {
+            $clean_toolbar = [];
+            foreach ($data['_toolbar_links'] as $item) {
+                if (!is_array($item)) continue;
+                $title = sanitize_text_field(wp_unslash((string) ($item['title'] ?? '')));
+                $url   = sanitize_text_field(wp_unslash((string) ($item['url'] ?? '')));
+                $url   = preg_replace('#^https?://[^/]+(/wp-admin/)?#', '', $url);
+                $url   = ltrim($url, '/');
+                if ($title !== '' || $url !== '') {
+                    $clean_toolbar[] = ['title' => $title, 'url' => $url];
+                }
+            }
+            update_option('wpzaklad_admin_menu_toolbar', $clean_toolbar);
+        }
 
         // Only import keys we know about, and sanitize each value by type.
         $sanitized = $this->defaults;

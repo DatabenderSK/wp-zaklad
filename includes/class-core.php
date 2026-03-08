@@ -25,6 +25,7 @@ class WPBL_Core {
         $this->settings->load();
         $this->init_modules();
         $this->init_admin();
+        WPBL_DB_Optimizer::init();
     }
 
     private function load_modules(): void {
@@ -38,6 +39,7 @@ class WPBL_Core {
             WPBL_Module_Whitelabel::class,
             WPBL_Module_Scripts::class,
             WPBL_Module_Performance::class,
+            WPBL_Module_Help_Videos::class,
             WPBL_Module_Admin_Menu::class,
             WPBL_Module_System::class,
         ];

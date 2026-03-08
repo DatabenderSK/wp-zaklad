@@ -86,28 +86,219 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
             <div class="wpbl-setting-info">
                 <strong class="wpbl-setting-label"><?php echo esc_html(wpbl_t('admin_menu_toolbar_title')); ?></strong>
                 <span class="wpbl-setting-desc"><?php echo esc_html(wpbl_t('admin_menu_toolbar_desc')); ?></span>
-                <table class="wpbl-toolbar-table">
-                    <thead>
-                        <tr>
-                            <th><?php echo esc_html(wpbl_t('admin_menu_toolbar_name')); ?></th>
-                            <th><?php echo esc_html(wpbl_t('admin_menu_toolbar_url')); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $toolbar = array_pad((array) $toolbar, 5, ['title' => '', 'url' => '']);
-                        for ($i = 0; $i < 5; $i++):
-                            $item = $toolbar[$i];
-                        ?>
-                        <tr>
-                            <td><input type="text" name="wpzaklad_toolbar[<?php echo $i; ?>][title]" value="<?php echo esc_attr($item['title'] ?? ''); ?>" class="regular-text"></td>
-                            <td><input type="text" name="wpzaklad_toolbar[<?php echo $i; ?>][url]" value="<?php echo esc_attr($item['url'] ?? ''); ?>" class="regular-text" placeholder="admin.php?page=…"></td>
-                        </tr>
-                        <?php endfor; ?>
-                    </tbody>
-                </table>
             </div>
         </div>
+
+        <style>
+        #wpbl-toolbar-list { margin-top: 4px; }
+        .wpbl-toolbar-card {
+            background: #f9f9f9;
+            border: 1px solid #dcdcde;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+        .wpbl-toolbar-handle {
+            padding: 12px 10px;
+            cursor: grab;
+            color: #c3c4c7;
+            flex-shrink: 0;
+            transition: color .15s;
+        }
+        .wpbl-toolbar-handle:hover { color: #787c82; }
+        .wpbl-toolbar-card.ui-sortable-helper { box-shadow: 0 4px 16px rgba(0,0,0,.14); border-color: #2271b1; }
+        .wpbl-toolbar-card.ui-sortable-placeholder { background: #f6f7f7; border: 2px dashed #c3c4c7; visibility: visible !important; }
+        .wpbl-toolbar-fields {
+            flex: 1;
+            padding: 10px 10px 10px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .wpbl-toolbar-fields input[type="text"] {
+            flex: 1;
+            font-size: 13px;
+        }
+        .wpbl-toolbar-remove-wrap {
+            padding: 8px 10px 8px 0;
+            flex-shrink: 0;
+        }
+        #wpbl-add-toolbar-link { margin-top: 4px; }
+        </style>
+
+        <div id="wpbl-toolbar-list">
+            <?php foreach ($toolbar as $i => $item): ?>
+            <div class="wpbl-toolbar-card">
+                <span class="wpbl-toolbar-handle dashicons dashicons-move" title="<?php echo esc_attr(wpbl_t('help_videos_drag')); ?>"></span>
+                <div class="wpbl-toolbar-fields">
+                    <input type="text" name="wpzaklad_toolbar[<?php echo $i; ?>][title]" value="<?php echo esc_attr($item['title'] ?? ''); ?>" placeholder="<?php echo esc_attr(wpbl_t('admin_menu_toolbar_name')); ?>">
+                    <input type="text" name="wpzaklad_toolbar[<?php echo $i; ?>][url]" value="<?php echo esc_attr($item['url'] ?? ''); ?>" placeholder="admin.php?page=…">
+                </div>
+                <div class="wpbl-toolbar-remove-wrap">
+                    <button type="button" class="button button-small wpbl-toolbar-remove"><?php echo esc_html(wpbl_t('help_videos_remove_row')); ?></button>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <button type="button" id="wpbl-add-toolbar-link" class="button">
+            <?php echo esc_html(wpbl_t('admin_menu_toolbar_add')); ?>
+        </button>
+
+        <script>
+        (function($) {
+            var list   = $('#wpbl-toolbar-list');
+            var addBtn = $('#wpbl-add-toolbar-link');
+            var lblName = <?php echo json_encode(wpbl_t('admin_menu_toolbar_name')); ?>;
+            var lblDrag = <?php echo json_encode(wpbl_t('help_videos_drag')); ?>;
+            var lblRm   = <?php echo json_encode(wpbl_t('help_videos_remove_row')); ?>;
+
+            function reindex() {
+                list.find('.wpbl-toolbar-card').each(function(i) {
+                    $(this).find('input').each(function() {
+                        this.name = this.name.replace(/\[\d+\]/, '[' + i + ']');
+                    });
+                });
+            }
+
+            function bindRemove(card) {
+                card.find('.wpbl-toolbar-remove').on('click', function() {
+                    card.remove();
+                    reindex();
+                });
+            }
+
+            function makeCard(idx) {
+                var card = $('<div class="wpbl-toolbar-card">');
+                card.append(
+                    $('<span>').addClass('wpbl-toolbar-handle dashicons dashicons-move').attr('title', lblDrag)
+                );
+                var fields = $('<div class="wpbl-toolbar-fields">');
+                fields.append(
+                    $('<input type="text">').attr({ name: 'wpzaklad_toolbar[' + idx + '][title]', placeholder: lblName }),
+                    $('<input type="text">').attr({ name: 'wpzaklad_toolbar[' + idx + '][url]', placeholder: 'admin.php?page=…' })
+                );
+                card.append(fields);
+                card.append(
+                    $('<div class="wpbl-toolbar-remove-wrap">').append(
+                        $('<button type="button" class="button button-small wpbl-toolbar-remove">').text(lblRm)
+                    )
+                );
+                return card;
+            }
+
+            addBtn.on('click', function() {
+                var idx  = list.find('.wpbl-toolbar-card').length;
+                var card = makeCard(idx);
+                bindRemove(card);
+                list.append(card);
+                card.find('input').first().focus();
+            });
+
+            list.find('.wpbl-toolbar-card').each(function() {
+                bindRemove($(this));
+            });
+
+            list.sortable({
+                handle: '.wpbl-toolbar-handle',
+                placeholder: 'wpbl-toolbar-card ui-sortable-placeholder',
+                forcePlaceholderSize: true,
+                stop: function() { reindex(); }
+            });
+        })(jQuery);
+        </script>
+
+        <!-- Toolbar export / import -->
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f1;">
+            <strong style="font-size:13px;"><?php echo esc_html(wpbl_t('toolbar_export_title')); ?></strong>
+            <div style="margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:200px;">
+                    <p style="margin:0 0 4px;font-size:12px;color:#646970;"><?php echo esc_html(wpbl_t('portability_export_label')); ?></p>
+                    <textarea id="wpbl-toolbar-export" class="large-text code" rows="4" readonly onclick="this.select()"><?php echo esc_textarea(wp_json_encode(get_option('wpzaklad_admin_menu_toolbar', []), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) ?: '[]'); ?></textarea>
+                    <p style="margin:6px 0 0;display:flex;gap:6px;">
+                        <button type="button" class="button button-small" id="wpbl-toolbar-copy"><?php echo esc_html(wpbl_t('portability_copy_btn')); ?></button>
+                        <button type="button" class="button button-small" id="wpbl-toolbar-download"><?php echo esc_html(wpbl_t('portability_download_btn')); ?></button>
+                    </p>
+                </div>
+                <div style="flex:1;min-width:200px;">
+                    <p style="margin:0 0 4px;font-size:12px;color:#646970;"><?php echo esc_html(wpbl_t('portability_import_label')); ?></p>
+                    <textarea id="wpbl-toolbar-import-json" class="large-text code" rows="4" placeholder="<?php echo esc_attr(wpbl_t('portability_import_placeholder')); ?>"></textarea>
+                    <p style="margin:6px 0 0;display:flex;gap:6px;align-items:center;">
+                        <button type="button" class="button button-small" id="wpbl-toolbar-import-btn"><?php echo esc_html(wpbl_t('portability_import_btn')); ?></button>
+                        <label class="button button-small" for="wpbl-toolbar-file" style="cursor:pointer;"><?php echo esc_html(wpbl_t('portability_upload_btn')); ?></label>
+                        <input type="file" id="wpbl-toolbar-file" accept=".json" style="display:none;">
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        (function($) {
+            var lblDrag = <?php echo json_encode(wpbl_t('help_videos_drag')); ?>;
+            var lblRm   = <?php echo json_encode(wpbl_t('help_videos_remove_row')); ?>;
+            var lblName = <?php echo json_encode(wpbl_t('admin_menu_toolbar_name')); ?>;
+            var errMsg  = <?php echo json_encode(wpbl_t('portability_invalid_json')); ?>;
+
+            function applyToolbarJson(json) {
+                try {
+                    var items = JSON.parse(json);
+                    if (!Array.isArray(items)) throw new Error();
+                    var list = $('#wpbl-toolbar-list');
+                    list.empty();
+                    items.forEach(function(item, i) {
+                        var card = $('<div class="wpbl-toolbar-card">');
+                        card.append($('<span>').addClass('wpbl-toolbar-handle dashicons dashicons-move').attr('title', lblDrag));
+                        var fields = $('<div class="wpbl-toolbar-fields">');
+                        fields.append(
+                            $('<input type="text">').attr({ name: 'wpzaklad_toolbar[' + i + '][title]', placeholder: lblName }).val(item.title || ''),
+                            $('<input type="text">').attr({ name: 'wpzaklad_toolbar[' + i + '][url]', placeholder: 'admin.php?page=…' }).val(item.url || '')
+                        );
+                        card.append(fields);
+                        card.append(
+                            $('<div class="wpbl-toolbar-remove-wrap">').append(
+                                $('<button type="button" class="button button-small wpbl-toolbar-remove">').text(lblRm)
+                            )
+                        );
+                        card.find('.wpbl-toolbar-remove').on('click', function() { card.remove(); });
+                        list.append(card);
+                    });
+                    $('#wpbl-toolbar-import-json').val('');
+                } catch(e) {
+                    alert(errMsg);
+                }
+            }
+
+            $('#wpbl-toolbar-copy').on('click', function() {
+                var ta = document.getElementById('wpbl-toolbar-export');
+                ta.select(); document.execCommand('copy');
+            });
+
+            $('#wpbl-toolbar-download').on('click', function() {
+                var data = $('#wpbl-toolbar-export').val();
+                var blob = new Blob([data], {type: 'application/json'});
+                var url  = URL.createObjectURL(blob);
+                var a    = document.createElement('a');
+                a.href = url; a.download = 'wpzaklad-toolbar-links.json';
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a); URL.revokeObjectURL(url);
+            });
+
+            $('#wpbl-toolbar-import-btn').on('click', function() {
+                applyToolbarJson($('#wpbl-toolbar-import-json').val().trim());
+            });
+
+            $('#wpbl-toolbar-file').on('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function(evt) { applyToolbarJson(evt.target.result); };
+                reader.readAsText(file);
+                this.value = '';
+            });
+        })(jQuery);
+        </script>
 
         <?php
     }
@@ -167,7 +358,7 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
 
         $bar->add_node([
             'id'    => 'wpzaklad-toolbar',
-            'title' => '<span class="ab-icon dashicons dashicons-bolt" style="top:2px;"></span>',
+            'title' => '<span class="ab-icon dashicons dashicons-bolt"></span><span class="ab-label">' . esc_html(wpbl_t('toolbar_label')) . '</span>',
             'href'  => '#',
         ]);
 

@@ -13,7 +13,6 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             'wpzaklad_disable_big_image'        => 0,
             'wpzaklad_revisions_limit'          => 5,
             'wpzaklad_disable_dashicons'        => 0,
-            'wpzaklad_jpeg_quality'             => 82,
         ];
     }
 
@@ -53,13 +52,6 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
                 'min'  => -1,
             ],
             ['key' => 'wpzaklad_disable_dashicons', 'type' => 'checkbox', 'label' => wpbl_t('disable_dashicons_label'), 'desc' => wpbl_t('disable_dashicons_desc'), 'recommended' => true],
-            [
-                'key'   => 'wpzaklad_jpeg_quality',
-                'type'  => 'number',
-                'label' => wpbl_t('jpeg_quality_label'),
-                'desc'  => wpbl_t('jpeg_quality_desc'),
-                'min'   => 60,
-            ],
         ];
     }
 
@@ -96,11 +88,6 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             add_action('wp_enqueue_scripts', [$this, 'disable_dashicons']);
         }
 
-        $jpeg_quality = (int) $this->get('wpzaklad_jpeg_quality');
-        if ($jpeg_quality && $jpeg_quality !== 82) {
-            add_filter('jpeg_quality',         fn() => $jpeg_quality);
-            add_filter('wp_editor_set_quality', fn() => $jpeg_quality);
-        }
     }
 
     public function disable_dashicons(): void {

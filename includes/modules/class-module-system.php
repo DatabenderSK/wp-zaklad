@@ -20,6 +20,54 @@ class WPBL_Module_System extends WPBL_Module_Base {
         ];
     }
 
+    public function render_custom_tab(): void {
+        global $wpdb;
+        $theme          = wp_get_theme();
+        $active_plugins = count(get_option('active_plugins', []));
+        $revisions      = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'revision'");
+        $transients     = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '_transient_%' AND option_name NOT LIKE '_transient_timeout_%'");
+        $is_https       = is_ssl();
+        $server         = $_SERVER['SERVER_SOFTWARE'] ?? '—';
+        $mysql_version  = $wpdb->db_version();
+        $max_exec       = ini_get('max_execution_time');
+        $wp_debug       = defined('WP_DEBUG') && WP_DEBUG;
+        $wp_memory      = defined('WP_MEMORY_LIMIT') ? WP_MEMORY_LIMIT : ini_get('memory_limit');
+
+        $ext_list = [];
+        foreach (['curl', 'gd', 'imagick', 'mbstring', 'zip', 'exif', 'intl'] as $ext) {
+            $ext_list[] = extension_loaded($ext)
+                ? '<span style="color:#00a32a;">&#10003; ' . $ext . '</span>'
+                : '<span style="color:#c3c4c7;">&times; ' . $ext . '</span>';
+        }
+        ?>
+        <div class="wpbl-setting">
+            <div class="wpbl-setting-info">
+                <strong class="wpbl-setting-label"><?php echo esc_html(wpbl_t('tools_sysinfo_title')); ?></strong>
+                <table class="wpbl-sysinfo" style="margin-top:8px;">
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_site_name')); ?></td><td><?php echo esc_html(get_bloginfo('name')); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_site_url')); ?></td><td><?php echo esc_html(home_url()); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_protocol')); ?></td><td><?php echo $is_https ? 'HTTPS' : 'HTTP'; ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_wp_version')); ?></td><td><?php echo esc_html(get_bloginfo('version')); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_wp_debug')); ?></td><td><?php echo $wp_debug ? '<span style="color:#d63638;font-weight:600;">ON</span>' : '<span style="color:#00a32a;">OFF</span>'; ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_wp_memory')); ?></td><td><?php echo esc_html($wp_memory); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_php_version')); ?></td><td><?php echo esc_html(PHP_VERSION); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_php_max_exec')); ?></td><td><?php echo esc_html($max_exec); ?>s</td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_memory_limit')); ?></td><td><?php echo esc_html(ini_get('memory_limit')); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_php_extensions')); ?></td><td><?php echo implode(' &nbsp; ', $ext_list); // phpcs:ignore ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_mysql_version')); ?></td><td><?php echo esc_html($mysql_version ?: '—'); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_db_prefix')); ?></td><td><?php echo esc_html($wpdb->prefix); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_server')); ?></td><td><?php echo esc_html($server); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_theme')); ?></td><td><?php echo esc_html($theme->get('Name')); ?> <?php echo esc_html($theme->get('Version')); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_active_plugins')); ?></td><td><?php echo esc_html($active_plugins); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_db_revisions')); ?></td><td><?php echo esc_html($revisions); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_db_transients')); ?></td><td><?php echo esc_html($transients); ?></td></tr>
+                    <tr><td><?php echo esc_html(wpbl_t('sysinfo_max_upload')); ?></td><td><?php echo esc_html(size_format(wp_max_upload_size())); ?></td></tr>
+                </table>
+            </div>
+        </div>
+        <?php
+    }
+
     public function init(): void {
         if ($this->get('wpzaklad_sysinfo_widget')) {
             add_action('wp_dashboard_setup',     [$this, 'register_system_info_widget']);

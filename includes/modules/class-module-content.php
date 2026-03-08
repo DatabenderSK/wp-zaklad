@@ -241,7 +241,7 @@ class WPBL_Module_Content extends WPBL_Module_Base {
                 $this->sanitize_svg_node($child, $allowed_elements, $allowed_attributes);
 
             } elseif (in_array($child->nodeType, [XML_PI_NODE, XML_COMMENT_NODE], true)) {
-                // Remove processing instructions (<?xml-stylesheet ...?>) and comments
+                // Remove processing instructions (e.g. xml-stylesheet) and comments
                 $to_remove[] = $child;
             }
         }

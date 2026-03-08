@@ -33,15 +33,15 @@ class WPBL_Core {
             WPBL_Module_Optimization::class,
             WPBL_Module_Seo::class,
             WPBL_Module_Security::class,
+            WPBL_Module_Performance::class,
+            WPBL_Module_Scripts::class,
             WPBL_Module_Appearance::class,
             WPBL_Module_Content::class,
-            WPBL_Module_Maintenance::class,
             WPBL_Module_Whitelabel::class,
-            WPBL_Module_Scripts::class,
-            WPBL_Module_Performance::class,
-            WPBL_Module_Help_Videos::class,
             WPBL_Module_Admin_Menu::class,
+            WPBL_Module_Help_Videos::class,
             WPBL_Module_System::class,
+            WPBL_Module_Maintenance::class,
         ];
 
         foreach ($module_classes as $class) {

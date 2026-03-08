@@ -192,6 +192,8 @@ class WPBL_Admin_UI {
             'wpzaklad_block_update_emails',
             'wpzaklad_disable_gravatars',
             'wpzaklad_noindex_search',
+            'wpzaklad_noindex_paginated',
+            'wpzaklad_redirect_attachments',
             'wpzaklad_hide_wp_version',
             'wpzaklad_disable_user_rest',
             'wpzaklad_security_headers',

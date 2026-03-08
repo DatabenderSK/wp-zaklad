@@ -11,7 +11,7 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             'wpzaklad_heartbeat'                => '',
             'wpzaklad_remove_query_strings'     => 0,
             'wpzaklad_disable_big_image'        => 0,
-            'wpzaklad_revisions_limit'          => 5,
+            'wpzaklad_revisions_limit'          => 10,
             'wpzaklad_disable_dashicons'        => 0,
         ];
     }

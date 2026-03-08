@@ -18,6 +18,7 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
             'wpzaklad_block_update_emails'    => 0,
             'wpzaklad_lazy_load_iframes'      => 0,
             'wpzaklad_disable_gravatars'      => 0,
+            'wpzaklad_local_avatars'          => 0,
         ];
     }
 
@@ -33,6 +34,7 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
             ['key' => 'wpzaklad_block_update_emails',    'type' => 'checkbox', 'label' => wpbl_t('block_update_emails_label'),    'desc' => wpbl_t('block_update_emails_desc'),    'recommended' => true],
             ['key' => 'wpzaklad_lazy_load_iframes',      'type' => 'checkbox', 'label' => wpbl_t('lazy_load_iframes_label'),      'desc' => wpbl_t('lazy_load_iframes_desc')],
             ['key' => 'wpzaklad_disable_gravatars',      'type' => 'checkbox', 'label' => wpbl_t('disable_gravatars_label'),      'desc' => wpbl_t('disable_gravatars_desc')],
+            ['key' => 'wpzaklad_local_avatars',          'type' => 'checkbox', 'label' => wpbl_t('local_avatars_label'),          'desc' => wpbl_t('local_avatars_desc')],
         ];
     }
 
@@ -68,6 +70,14 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
         }
         if ($this->get('wpzaklad_disable_gravatars')) {
             add_filter('option_show_avatars', '__return_false');
+        }
+        if ($this->get('wpzaklad_local_avatars')) {
+            add_filter('get_avatar_url',             [$this, 'get_local_avatar_url'], 10, 3);
+            add_action('show_user_profile',          [$this, 'user_avatar_field']);
+            add_action('edit_user_profile',          [$this, 'user_avatar_field']);
+            add_action('personal_options_update',    [$this, 'save_user_avatar_field']);
+            add_action('edit_user_profile_update',   [$this, 'save_user_avatar_field']);
+            add_action('admin_enqueue_scripts',      [$this, 'enqueue_avatar_scripts']);
         }
     }
 
@@ -155,5 +165,112 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
 
     public function lazy_load_iframes(string $content): string {
         return str_replace('<iframe ', '<iframe loading="lazy" ', $content);
+    }
+
+    // -------------------------------------------------------------------------
+    // Local Avatars
+    // -------------------------------------------------------------------------
+
+    public function get_local_avatar_url(string $url, $id_or_email, array $args): string {
+        $user_id = 0;
+        if (is_numeric($id_or_email)) {
+            $user_id = (int) $id_or_email;
+        } elseif ($id_or_email instanceof \WP_User) {
+            $user_id = $id_or_email->ID;
+        } elseif ($id_or_email instanceof \WP_Post) {
+            $user_id = (int) $id_or_email->post_author;
+        } elseif (is_string($id_or_email) && is_email($id_or_email)) {
+            $user = get_user_by('email', $id_or_email);
+            if ($user) {
+                $user_id = $user->ID;
+            }
+        }
+        if (!$user_id) {
+            return $url;
+        }
+        $attachment_id = (int) get_user_meta($user_id, 'wpzaklad_local_avatar', true);
+        if (!$attachment_id) {
+            return $url;
+        }
+        $size        = isset($args['size']) ? (int) $args['size'] : 96;
+        $custom_url  = wp_get_attachment_image_url($attachment_id, [$size, $size]);
+        return $custom_url ?: $url;
+    }
+
+    public function user_avatar_field(\WP_User $user): void {
+        $attachment_id = (int) get_user_meta($user->ID, 'wpzaklad_local_avatar', true);
+        $preview_url   = $attachment_id ? wp_get_attachment_image_url($attachment_id, 'thumbnail') : '';
+        ?>
+        <h3><?php echo esc_html(wpbl_t('local_avatar_section')); ?></h3>
+        <table class="form-table">
+            <tr>
+                <th><label><?php echo esc_html(wpbl_t('local_avatar_label')); ?></label></th>
+                <td>
+                    <div id="wpzaklad-avatar-preview" style="margin-bottom:10px;">
+                        <?php if ($preview_url): ?>
+                            <img src="<?php echo esc_url($preview_url); ?>" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:block;">
+                        <?php endif; ?>
+                    </div>
+                    <input type="hidden" name="wpzaklad_local_avatar" id="wpzaklad_local_avatar" value="<?php echo esc_attr($attachment_id ?: ''); ?>">
+                    <button type="button" class="button" id="wpzaklad-avatar-upload"><?php echo esc_html(wpbl_t('local_avatar_choose')); ?></button>
+                    <button type="button" class="button" id="wpzaklad-avatar-remove"<?php echo $attachment_id ? '' : ' style="display:none;"'; ?>><?php echo esc_html(wpbl_t('local_avatar_remove')); ?></button>
+                    <p class="description" style="margin-top:6px;"><?php echo esc_html(wpbl_t('local_avatar_field_desc')); ?></p>
+                </td>
+            </tr>
+        </table>
+        <script>
+        jQuery(function($){
+            var frame;
+            $('#wpzaklad-avatar-upload').on('click', function(e){
+                e.preventDefault();
+                if (frame) { frame.open(); return; }
+                frame = wp.media({
+                    title:    '<?php echo esc_js(wpbl_t('local_avatar_choose')); ?>',
+                    button:   { text: '<?php echo esc_js(wpbl_t('local_avatar_select')); ?>' },
+                    multiple: false,
+                    library:  { type: 'image' }
+                });
+                frame.on('select', function(){
+                    var attachment = frame.state().get('selection').first().toJSON();
+                    $('#wpzaklad_local_avatar').val(attachment.id);
+                    var thumb = (attachment.sizes && attachment.sizes.thumbnail)
+                        ? attachment.sizes.thumbnail.url
+                        : attachment.url;
+                    $('#wpzaklad-avatar-preview').html('<img src="' + thumb + '" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:block;">');
+                    $('#wpzaklad-avatar-remove').show();
+                });
+                frame.open();
+            });
+            $('#wpzaklad-avatar-remove').on('click', function(e){
+                e.preventDefault();
+                $('#wpzaklad_local_avatar').val('');
+                $('#wpzaklad-avatar-preview').html('');
+                $(this).hide();
+            });
+        });
+        </script>
+        <?php
+    }
+
+    public function save_user_avatar_field(int $user_id): void {
+        if (!current_user_can('edit_user', $user_id)) {
+            return;
+        }
+        if (!isset($_POST['wpzaklad_local_avatar'])) {
+            return;
+        }
+        $attachment_id = absint($_POST['wpzaklad_local_avatar']);
+        if ($attachment_id) {
+            update_user_meta($user_id, 'wpzaklad_local_avatar', $attachment_id);
+        } else {
+            delete_user_meta($user_id, 'wpzaklad_local_avatar');
+        }
+    }
+
+    public function enqueue_avatar_scripts(string $hook): void {
+        if (!in_array($hook, ['profile.php', 'user-edit.php'], true)) {
+            return;
+        }
+        wp_enqueue_media();
     }
 }

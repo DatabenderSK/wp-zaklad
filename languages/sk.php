@@ -346,4 +346,14 @@ return [
     'track_last_login_desc'          => 'Uloží čas posledného prihlásenia každého používateľa a zobrazí ho ako stĺpec v zozname používateľov.',
     'last_login_column'              => 'Posledné prihlásenie',
     'never_logged_in'                => 'Nikdy',
+
+    // Optimization – local avatars
+    'local_avatars_label'            => 'Vlastné avatary (lokálne)',
+    'local_avatars_desc'             => 'Umožní nahrať vlastnú profilovú fotku pre každého používateľa priamo z knižnice médií – namiesto Gravataru z externého servera.',
+    'local_avatar_section'           => 'Profilová fotka',
+    'local_avatar_label'             => 'Vlastná fotka',
+    'local_avatar_choose'            => 'Vybrať z galérie',
+    'local_avatar_select'            => 'Použiť túto fotku',
+    'local_avatar_remove'            => 'Odstrániť fotku',
+    'local_avatar_field_desc'        => 'Nahraná fotka nahradí Gravatar na celom webe.',
 ];

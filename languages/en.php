@@ -346,4 +346,14 @@ return [
     'track_last_login_desc'          => 'Records the last login time for each user and shows it as a column in the Users list.',
     'last_login_column'              => 'Last Login',
     'never_logged_in'                => 'Never',
+
+    // Optimization – local avatars
+    'local_avatars_label'            => 'Local Avatars',
+    'local_avatars_desc'             => 'Allows uploading a custom profile photo for each user directly from the media library – instead of a Gravatar from an external server.',
+    'local_avatar_section'           => 'Profile Photo',
+    'local_avatar_label'             => 'Custom Photo',
+    'local_avatar_choose'            => 'Choose from Media Library',
+    'local_avatar_select'            => 'Use this photo',
+    'local_avatar_remove'            => 'Remove photo',
+    'local_avatar_field_desc'        => 'The uploaded photo replaces Gravatar across the entire site.',
 ];

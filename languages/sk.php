@@ -296,6 +296,15 @@ return [
     'block_author_scan_label'        => 'Blokovať skenovanie autorov cez URL',
     'block_author_scan_desc'         => 'Požiadavky s parametrom /?author=1 presmerujú na /author/admin/ a odhalia prihlasovacie meno administrátora. Toto nastavenie ich okamžite presmeruje na hlavnú stránku.',
 
+    // Security – login rate limit
+    'login_rate_limit_label'         => 'Brute-force ochrana (rate limit)',
+    'login_rate_limit_desc'          => 'Zablokuje IP adresu po opakovaných neúspešných pokusoch o prihlásenie. Efektívna ochrana proti hádaniu hesiel botmi.',
+    'login_max_attempts_label'       => 'Max. počet pokusov',
+    'login_max_attempts_desc'        => 'Koľko neúspešných pokusov o prihlásenie z jednej IP adresy je povolených pred zablokovaním. Predvolené: 5.',
+    'login_lockout_minutes_label'    => 'Doba zablokovania (minúty)',
+    'login_lockout_minutes_desc'     => 'Na koľko minút bude IP adresa zablokovaná po prekročení limitu pokusov. Predvolené: 15.',
+    'login_locked_out'               => '<strong>Príliš veľa neúspešných pokusov.</strong> Skúste to znova o %d minút.',
+
     // Security – custom login URL
     'login_honeypot_label'           => 'Login honeypot',
     'login_honeypot_desc'            => 'Pridá skryté pole do prihlasovacieho formulára. Boti, ktorí ho vyplnia, sú zablokovaní – ľudia ho nevidia. Neblokuje legitímnych používateľov.',

@@ -296,6 +296,15 @@ return [
     'block_author_scan_label'        => 'Block Author Scan via URL',
     'block_author_scan_desc'         => 'Requests with /?author=1 redirect to /author/admin/ and reveal the admin login name. This setting immediately redirects them to the homepage instead.',
 
+    // Security – login rate limit
+    'login_rate_limit_label'         => 'Brute-force Protection (Rate Limit)',
+    'login_rate_limit_desc'          => 'Blocks an IP address after repeated failed login attempts. Effective protection against password-guessing bots.',
+    'login_max_attempts_label'       => 'Max. Attempts',
+    'login_max_attempts_desc'        => 'How many failed login attempts from a single IP are allowed before lockout. Default: 5.',
+    'login_lockout_minutes_label'    => 'Lockout Duration (minutes)',
+    'login_lockout_minutes_desc'     => 'How many minutes the IP address will be blocked after exceeding the attempt limit. Default: 15.',
+    'login_locked_out'               => '<strong>Too many failed attempts.</strong> Please try again in %d minutes.',
+
     // Security – custom login URL
     'login_honeypot_label'           => 'Login Honeypot',
     'login_honeypot_desc'            => 'Adds a hidden field to the login form. Bots that fill it are blocked; humans never see it. Does not lock out legitimate users.',

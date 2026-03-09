@@ -21,6 +21,9 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             'wpzaklad_disable_php_uploads'       => 0,
             'wpzaklad_custom_login_slug'         => '',
             'wpzaklad_extend_login_expiry'       => 0,
+            'wpzaklad_login_rate_limit'          => 0,
+            'wpzaklad_login_max_attempts'        => 5,
+            'wpzaklad_login_lockout_minutes'     => 15,
         ];
     }
 
@@ -38,7 +41,10 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             ['key' => 'wpzaklad_disable_app_passwords',    'type' => 'checkbox', 'label' => wpbl_t('disable_app_passwords_label'),     'desc' => wpbl_t('disable_app_passwords_desc'),    'recommended' => true],
             ['key' => 'wpzaklad_disable_php_uploads',      'type' => 'checkbox', 'label' => wpbl_t('disable_php_uploads_label'),       'desc' => wpbl_t('disable_php_uploads_desc'),      'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_custom_login_slug',        'type' => 'text',     'label' => wpbl_t('custom_login_slug_label'),         'desc' => wpbl_t('custom_login_slug_desc')],
-            ['key' => 'wpzaklad_extend_login_expiry',      'type' => 'checkbox', 'label' => wpbl_t('extend_login_expiry_label'),      'desc' => wpbl_t('extend_login_expiry_desc'),      'mine' => true, 'new' => true],
+            ['key' => 'wpzaklad_extend_login_expiry',      'type' => 'checkbox', 'label' => wpbl_t('extend_login_expiry_label'),      'desc' => wpbl_t('extend_login_expiry_desc'),      'mine' => true],
+            ['key' => 'wpzaklad_login_rate_limit',        'type' => 'checkbox', 'label' => wpbl_t('login_rate_limit_label'),        'desc' => wpbl_t('login_rate_limit_desc'),        'recommended' => true, 'mine' => true, 'new' => true],
+            ['key' => 'wpzaklad_login_max_attempts',      'type' => 'number',   'label' => wpbl_t('login_max_attempts_label'),      'desc' => wpbl_t('login_max_attempts_desc'),      'min' => 1],
+            ['key' => 'wpzaklad_login_lockout_minutes',   'type' => 'number',   'label' => wpbl_t('login_lockout_minutes_label'),   'desc' => wpbl_t('login_lockout_minutes_desc'),   'min' => 1],
         ];
     }
 
@@ -112,6 +118,12 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             add_filter('auth_cookie_expiration', fn() => 30 * DAY_IN_SECONDS);
         }
 
+        if ($this->get('wpzaklad_login_rate_limit')) {
+            add_filter('authenticate',    [$this, 'check_login_lockout'], 0);
+            add_action('wp_login_failed',  [$this, 'track_failed_login']);
+            add_action('wp_login',         [$this, 'clear_login_attempts']);
+        }
+
         // Allow letters, numbers, hyphens, underscores, dots (so vphovno.php works)
         $slug = preg_replace('/[^a-z0-9\-_.]/i', '', (string) $this->get('wpzaklad_custom_login_slug'));
         $slug = strtolower(trim($slug, '-_.'));
@@ -183,6 +195,60 @@ class WPBL_Module_Security extends WPBL_Module_Base {
         add_filter('network_site_url',   fn(string $u, string $p) => str_contains($p, 'wp-login.php') ? str_replace('wp-login.php', $slug, $u) : $u, 10, 2);
         add_filter('wp_redirect',        fn(string $u) => str_contains($u, 'wp-login.php') ? str_replace('wp-login.php', $slug, $u) : $u);
     }
+
+    // -------------------------------------------------------------------------
+    // Login rate limiting (brute-force protection)
+    // -------------------------------------------------------------------------
+
+    public function check_login_lockout($user) {
+        $ip       = $this->get_client_ip();
+        $lock_key = 'wpbl_login_lock_' . md5($ip);
+
+        if (get_transient($lock_key)) {
+            $minutes = (int) $this->get('wpzaklad_login_lockout_minutes') ?: 15;
+            return new \WP_Error(
+                'wpbl_locked_out',
+                sprintf(wpbl_t('login_locked_out'), $minutes)
+            );
+        }
+
+        return $user;
+    }
+
+    public function track_failed_login(string $username): void {
+        $ip       = $this->get_client_ip();
+        $fail_key = 'wpbl_login_fails_' . md5($ip);
+        $count    = (int) get_transient($fail_key) + 1;
+        $max      = (int) $this->get('wpzaklad_login_max_attempts') ?: 5;
+
+        if ($count >= $max) {
+            $lockout = (int) $this->get('wpzaklad_login_lockout_minutes') ?: 15;
+            set_transient('wpbl_login_lock_' . md5($ip), time(), $lockout * MINUTE_IN_SECONDS);
+            delete_transient($fail_key);
+        } else {
+            set_transient($fail_key, $count, 30 * MINUTE_IN_SECONDS);
+        }
+    }
+
+    public function clear_login_attempts(string $username): void {
+        $ip = $this->get_client_ip();
+        delete_transient('wpbl_login_fails_' . md5($ip));
+        delete_transient('wpbl_login_lock_' . md5($ip));
+    }
+
+    private function get_client_ip(): string {
+        foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'] as $header) {
+            $ip = $_SERVER[$header] ?? '';
+            if ($ip !== '') {
+                return trim(explode(',', $ip)[0]);
+            }
+        }
+        return '0.0.0.0';
+    }
+
+    // -------------------------------------------------------------------------
+    // REST API restrictions
+    // -------------------------------------------------------------------------
 
     public function restrict_rest_api($result) {
         if (!empty($result)) {

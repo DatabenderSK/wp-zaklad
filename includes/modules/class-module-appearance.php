@@ -17,6 +17,7 @@ class WPBL_Module_Appearance extends WPBL_Module_Base {
             'wpzaklad_color_pending'            => '#fff8e5',
             'wpzaklad_color_private'            => '#f0f0f0',
             'wpzaklad_color_future'             => '#e8f5e9',
+            'wpzaklad_login_bg_color'           => '',
         ];
     }
 
@@ -27,6 +28,7 @@ class WPBL_Module_Appearance extends WPBL_Module_Base {
                 'type'  => 'checkbox',
                 'label' => wpbl_t('custom_login_logo_label'),
                 'desc'  => wpbl_t('custom_login_logo_desc'),
+                'mine'  => true,
             ],
             [
                 'key'   => 'wpzaklad_custom_login_logo_url',
@@ -34,13 +36,14 @@ class WPBL_Module_Appearance extends WPBL_Module_Base {
                 'label' => wpbl_t('custom_login_logo_url_label'),
                 'desc'  => wpbl_t('custom_login_logo_url_desc'),
             ],
-            ['key' => 'wpzaklad_clean_dashboard',        'type' => 'checkbox', 'label' => wpbl_t('clean_dashboard_label'),    'desc' => wpbl_t('clean_dashboard_desc')],
+            ['key' => 'wpzaklad_clean_dashboard',        'type' => 'checkbox', 'label' => wpbl_t('clean_dashboard_label'),    'desc' => wpbl_t('clean_dashboard_desc'), 'mine' => true],
             ['key' => 'wpzaklad_hide_admin_for_clients', 'type' => 'checkbox', 'label' => wpbl_t('hide_admin_clients_label'), 'desc' => wpbl_t('hide_admin_clients_desc')],
-            ['key' => 'wpzaklad_colored_post_statuses',  'type' => 'checkbox', 'label' => wpbl_t('colored_statuses_label'),   'desc' => wpbl_t('colored_statuses_desc')],
+            ['key' => 'wpzaklad_colored_post_statuses',  'type' => 'checkbox', 'label' => wpbl_t('colored_statuses_label'),   'desc' => wpbl_t('colored_statuses_desc'), 'mine' => true],
             ['key' => 'wpzaklad_color_draft',            'type' => 'color',    'label' => wpbl_t('color_draft_label'),        'default' => '#fce8e8'],
             ['key' => 'wpzaklad_color_pending',          'type' => 'color',    'label' => wpbl_t('color_pending_label'),      'default' => '#fff8e5'],
             ['key' => 'wpzaklad_color_private',          'type' => 'color',    'label' => wpbl_t('color_private_label'),      'default' => '#f0f0f0'],
             ['key' => 'wpzaklad_color_future',           'type' => 'color',    'label' => wpbl_t('color_future_label'),       'default' => '#e8f5e9'],
+            ['key' => 'wpzaklad_login_bg_color', 'type' => 'color', 'label' => wpbl_t('login_bg_color_label'), 'desc' => wpbl_t('login_bg_color_desc'), 'default' => '', 'mine' => true],
         ];
     }
 
@@ -48,6 +51,12 @@ class WPBL_Module_Appearance extends WPBL_Module_Base {
         if ($this->get('wpzaklad_custom_login_logo') && $this->get('wpzaklad_custom_login_logo_url')) {
             add_action('login_enqueue_scripts', [$this, 'custom_login_logo']);
             add_filter('login_headerurl', fn() => home_url());
+        }
+        $login_bg = $this->get('wpzaklad_login_bg_color');
+        if ($login_bg && sanitize_hex_color($login_bg)) {
+            add_action('login_enqueue_scripts', function () use ($login_bg) {
+                echo '<style>body.login { background-color: ' . esc_attr(sanitize_hex_color($login_bg)) . ' !important; }</style>' . "\n";
+            });
         }
         if ($this->get('wpzaklad_clean_dashboard')) {
             add_action('wp_dashboard_setup', [$this, 'clean_dashboard']);

@@ -65,11 +65,11 @@ return [
     'disable_file_edit_label'       => 'Disable File Editor in Admin',
     'disable_file_edit_desc'        => 'Hides the theme and plugin editor – recommended for production sites.',
     'disable_rest_unauth_label'     => 'Disable REST API for Unauthenticated Users',
-    'disable_rest_unauth_desc'      => 'The REST API is the interface WordPress uses to communicate with other applications. This blocks the entire API for visitors who are not logged in. <strong>Note:</strong> may break Contact Form 7, Elementor, and other plugins that use the REST API. Hiding only the users endpoint (below) is the safer choice.',
+    'disable_rest_unauth_desc'      => 'The REST API is the interface WordPress uses to communicate with other applications. This blocks access for unauthenticated users, but automatically whitelists known plugins (Fluent Forms, CF7, WPForms, GenerateBlocks). Hiding only the users endpoint (below) is the safer choice.',
     'disable_user_rest_label'       => 'Hide Users via REST API and Author Archives',
     'disable_user_rest_desc'        => 'The /wp/v2/users endpoint publicly exposes admin login names, and author archives reveal them further. Closes both without affecting other plugins.',
     'security_headers_label'        => 'Security HTTP Headers',
-    'security_headers_desc'         => 'Adds three protective headers: prevents embedding the site in iframes (clickjacking), prevents MIME-type sniffing, and controls Referer information sent to other sites.',
+    'security_headers_desc'         => 'Adds protective HTTP headers: prevents iframe embedding (clickjacking), MIME-type sniffing, controls Referer, blocks camera/microphone/geolocation access, and enables browser XSS filter.',
 
     // Appearance
     'custom_login_logo_label'       => 'Custom Login Page Logo',
@@ -356,4 +356,31 @@ return [
     'local_avatar_select'            => 'Use this photo',
     'local_avatar_remove'            => 'Remove photo',
     'local_avatar_field_desc'        => 'The uploaded photo replaces Gravatar across the entire site.',
+
+    // Conflict detector
+    'conflict_gutenberg_generateblocks' => 'Conflict: "Disable Gutenberg" is enabled, but GenerateBlocks requires the block editor. Gutenberg will not work with GenerateBlocks.',
+    'conflict_rest_fluentforms'         => 'Conflict: "Disable REST API for unauthenticated users" is enabled, but Fluent Forms requires the REST API. Forms will not work for visitors.',
+    'conflict_rest_cf7'                 => 'Warning: "Disable REST API for unauthenticated users" is enabled. Contact Form 7 REST endpoints are automatically whitelisted.',
+    'conflict_robots_rankmath'          => 'Info: Custom robots.txt is set, but RankMath also manages robots.txt. They may overwrite each other.',
+
+    // SEO – disable WP sitemap
+    'disable_wp_sitemap_label'          => 'Disable WP Sitemap',
+    'disable_wp_sitemap_desc'           => 'Disables the default WordPress sitemap (wp-sitemap.xml). Unnecessary when RankMath or Yoast SEO generates its own sitemap.',
+
+    // SEO – plugin active notice
+    'seo_plugin_active_notice'          => '%s is active. SEO settings (noindex, robots.txt) are automatically delegated to the SEO plugin.',
+
+    // Optimization – disable admin emails
+    'disable_admin_emails_label'        => 'Disable Admin Notification Emails',
+    'disable_admin_emails_desc'         => 'Stops emails about password changes, email changes, new users, and admin email verification. Complements "Block Update Emails" (which only blocks auto-update emails).',
+
+    // Appearance – login bg color
+    'login_bg_color_label'              => 'Login Page Background Color',
+    'login_bg_color_desc'               => 'Sets the background color of the login page. Leave empty for default behavior.',
+
+    // Maintenance – scheduled
+    'maintenance_start_label'           => 'Maintenance Start',
+    'maintenance_start_desc'            => 'Optional. Maintenance mode activates from this date and time. Leave empty for immediate activation.',
+    'maintenance_end_label'             => 'Maintenance End',
+    'maintenance_end_desc'              => 'Optional. Maintenance mode automatically deactivates after this date and time. Leave empty for manual deactivation.',
 ];

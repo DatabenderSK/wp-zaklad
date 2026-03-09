@@ -25,17 +25,17 @@ class WPBL_Module_Security extends WPBL_Module_Base {
 
     public function get_fields(): array {
         return [
-            ['key' => 'wpzaklad_hide_wp_version',          'type' => 'checkbox', 'label' => wpbl_t('hide_wp_version_label'),          'desc' => wpbl_t('hide_wp_version_desc'),          'recommended' => true],
+            ['key' => 'wpzaklad_hide_wp_version',          'type' => 'checkbox', 'label' => wpbl_t('hide_wp_version_label'),          'desc' => wpbl_t('hide_wp_version_desc'),          'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_disable_file_edit',        'type' => 'checkbox', 'label' => wpbl_t('disable_file_edit_label'),         'desc' => wpbl_t('disable_file_edit_desc'),        'recommended' => true],
             ['key' => 'wpzaklad_disable_rest_unauth',      'type' => 'checkbox', 'label' => wpbl_t('disable_rest_unauth_label'),       'desc' => wpbl_t('disable_rest_unauth_desc')],
-            ['key' => 'wpzaklad_disable_user_rest',        'type' => 'checkbox', 'label' => wpbl_t('disable_user_rest_label'),         'desc' => wpbl_t('disable_user_rest_desc'),        'recommended' => true],
-            ['key' => 'wpzaklad_security_headers',         'type' => 'checkbox', 'label' => wpbl_t('security_headers_label'),          'desc' => wpbl_t('security_headers_desc'),         'recommended' => true],
+            ['key' => 'wpzaklad_disable_user_rest',        'type' => 'checkbox', 'label' => wpbl_t('disable_user_rest_label'),         'desc' => wpbl_t('disable_user_rest_desc'),        'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_security_headers',         'type' => 'checkbox', 'label' => wpbl_t('security_headers_label'),          'desc' => wpbl_t('security_headers_desc'),         'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_hide_updates_for_clients', 'type' => 'checkbox', 'label' => wpbl_t('hide_updates_label'),              'desc' => wpbl_t('hide_updates_desc')],
-            ['key' => 'wpzaklad_hide_login_errors',        'type' => 'checkbox', 'label' => wpbl_t('hide_login_errors_label'),         'desc' => wpbl_t('hide_login_errors_desc'),        'recommended' => true],
-            ['key' => 'wpzaklad_block_author_scan',        'type' => 'checkbox', 'label' => wpbl_t('block_author_scan_label'),         'desc' => wpbl_t('block_author_scan_desc'),        'recommended' => true],
-            ['key' => 'wpzaklad_login_honeypot',           'type' => 'checkbox', 'label' => wpbl_t('login_honeypot_label'),            'desc' => wpbl_t('login_honeypot_desc'),           'recommended' => true],
-            ['key' => 'wpzaklad_disable_app_passwords',    'type' => 'checkbox', 'label' => wpbl_t('disable_app_passwords_label'),     'desc' => wpbl_t('disable_app_passwords_desc'),    'recommended' => true],
-            ['key' => 'wpzaklad_disable_php_uploads',      'type' => 'checkbox', 'label' => wpbl_t('disable_php_uploads_label'),       'desc' => wpbl_t('disable_php_uploads_desc'),      'recommended' => true],
+            ['key' => 'wpzaklad_hide_login_errors',        'type' => 'checkbox', 'label' => wpbl_t('hide_login_errors_label'),         'desc' => wpbl_t('hide_login_errors_desc'),        'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_block_author_scan',        'type' => 'checkbox', 'label' => wpbl_t('block_author_scan_label'),         'desc' => wpbl_t('block_author_scan_desc'),        'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_login_honeypot',           'type' => 'checkbox', 'label' => wpbl_t('login_honeypot_label'),            'desc' => wpbl_t('login_honeypot_desc'),           'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_disable_app_passwords',    'type' => 'checkbox', 'label' => wpbl_t('disable_app_passwords_label'),     'desc' => wpbl_t('disable_app_passwords_desc'),    'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_disable_php_uploads',      'type' => 'checkbox', 'label' => wpbl_t('disable_php_uploads_label'),       'desc' => wpbl_t('disable_php_uploads_desc'),      'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_custom_login_slug',        'type' => 'text',     'label' => wpbl_t('custom_login_slug_label'),         'desc' => wpbl_t('custom_login_slug_desc')],
         ];
     }
@@ -182,14 +182,36 @@ class WPBL_Module_Security extends WPBL_Module_Base {
         if (!empty($result)) {
             return $result;
         }
-        if (!is_user_logged_in()) {
-            return new WP_Error(
-                'rest_not_logged_in',
-                'REST API requires authentication.',
-                ['status' => 401]
-            );
+        if (is_user_logged_in()) {
+            return $result;
         }
-        return $result;
+
+        // Whitelist known plugin REST namespaces
+        $whitelist = [
+            'fluentform',
+            'frm',
+            'contact-form-7',
+            'wpforms',
+            'generateblocks',
+        ];
+        $whitelist = apply_filters('wpzaklad_rest_whitelist', $whitelist);
+
+        $rest_route = $GLOBALS['wp']->query_vars['rest_route'] ?? '';
+        if ($rest_route === '') {
+            $rest_route = $_SERVER['REQUEST_URI'] ?? '';
+        }
+
+        foreach ($whitelist as $namespace) {
+            if (strpos($rest_route, '/' . $namespace . '/') !== false || strpos($rest_route, '/' . $namespace) === strlen($rest_route) - strlen('/' . $namespace)) {
+                return $result;
+            }
+        }
+
+        return new WP_Error(
+            'rest_not_logged_in',
+            'REST API requires authentication.',
+            ['status' => 401]
+        );
     }
 
     public function remove_user_endpoints(array $endpoints): array {
@@ -207,6 +229,8 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             header('X-Frame-Options: SAMEORIGIN');
             header('X-Content-Type-Options: nosniff');
             header('Referrer-Policy: strict-origin-when-cross-origin');
+            header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+            header('X-XSS-Protection: 1; mode=block');
         }
     }
 

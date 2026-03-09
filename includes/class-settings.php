@@ -114,7 +114,7 @@ class WPBL_Settings {
         // Hex color fields
         $color_fields = [
             'wpzaklad_maintenance_bg', 'wpzaklad_color_draft', 'wpzaklad_color_pending',
-            'wpzaklad_color_private', 'wpzaklad_color_future',
+            'wpzaklad_color_private', 'wpzaklad_color_future', 'wpzaklad_login_bg_color',
         ];
         if (in_array($key, $color_fields, true)) {
             return sanitize_hex_color((string) $value) ?: (is_string($default) ? $default : '');

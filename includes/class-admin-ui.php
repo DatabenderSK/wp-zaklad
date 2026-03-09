@@ -76,12 +76,25 @@ class WPBL_Admin_UI {
                 'meta'  => ['class' => 'wpbl-bar-warning'],
             ]);
         }
+
+        // Conflict warnings
+        $conflicts = WPBL_Conflict_Detector::detect($this->settings);
+        foreach ($conflicts as $i => $conflict) {
+            if ($conflict['severity'] !== 'critical') continue;
+            $wp_admin_bar->add_node([
+                'id'    => 'wpbl-conflict-' . $i,
+                'title' => '&#9888; ' . wpbl_t($conflict['message_key']),
+                'href'  => admin_url('options-general.php?page=wp-zaklad'),
+                'meta'  => ['class' => 'wpbl-bar-warning'],
+            ]);
+        }
     }
 
     public function output_admin_bar_warning_css(): void {
-        if (!$this->get_active_warnings()) return;
         if (!current_user_can('manage_options')) return;
-        echo '<style>#wp-admin-bar-wpbl-noindex-warning .ab-item,#wp-admin-bar-wpbl-maintenance-warning .ab-item{background:#d63638!important;color:#fff!important;}</style>' . "\n";
+        $has_warnings = $this->get_active_warnings() || WPBL_Conflict_Detector::detect($this->settings);
+        if (!$has_warnings) return;
+        echo '<style>#wp-admin-bar-wpbl-noindex-warning .ab-item,#wp-admin-bar-wpbl-maintenance-warning .ab-item,[id^="wp-admin-bar-wpbl-conflict-"] .ab-item{background:#d63638!important;color:#fff!important;}</style>' . "\n";
     }
 
     // -------------------------------------------------------------------------
@@ -182,36 +195,14 @@ class WPBL_Admin_UI {
             }
         }
 
-        // "Moje" preset – user's personal defaults (checkboxes that should be ON)
-        $mine_keys = [
-            'wpzaklad_disable_emoji',
-            'wpzaklad_disable_xmlrpc',
-            'wpzaklad_remove_jquery_migrate',
-            'wpzaklad_disable_self_pingbacks',
-            'wpzaklad_clean_head',
-            'wpzaklad_block_update_emails',
-            'wpzaklad_disable_gravatars',
-            'wpzaklad_noindex_search',
-            'wpzaklad_noindex_paginated',
-            'wpzaklad_redirect_attachments',
-            'wpzaklad_hide_wp_version',
-            'wpzaklad_disable_user_rest',
-            'wpzaklad_security_headers',
-            'wpzaklad_hide_login_errors',
-            'wpzaklad_block_author_scan',
-            'wpzaklad_custom_login_logo',
-            'wpzaklad_clean_dashboard',
-            'wpzaklad_colored_post_statuses',
-            'wpzaklad_disable_comments',
-            'wpzaklad_allow_svg',
-            'wpzaklad_lowercase_filenames',
-            'wpzaklad_year_shortcode',
-            'wpzaklad_search_title_shortcode',
-            'wpzaklad_hide_wp_logo',
-            'wpzaklad_hide_howdy',
-            'wpzaklad_disable_dashicons',
-            'wpzaklad_sysinfo_widget',
-        ];
+        $mine_keys = [];
+        foreach ($this->modules as $module) {
+            foreach ($module->get_fields() as $field) {
+                if (!empty($field['mine'])) {
+                    $mine_keys[] = $field['key'];
+                }
+            }
+        }
 
         wp_localize_script('wpbl-admin', 'wpbl', [
             'resetConfirm'    => wpbl_t('reset_confirm'),
@@ -356,6 +347,10 @@ class WPBL_Admin_UI {
                         $sanitized[$key] = intval($value);
                         break;
 
+                    case 'datetime':
+                        $sanitized[$key] = preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', (string) $value) ? (string) $value : '';
+                        break;
+
                     case 'select':
                         $allowed = array_keys($field['options'] ?? []);
                         $sanitized[$key] = in_array($value, $allowed, true) ? $value : ($allowed[0] ?? '');
@@ -437,6 +432,9 @@ class WPBL_Admin_UI {
 
             <!-- Notices -->
             <?php $this->render_notice($updated); ?>
+
+            <!-- Conflict warnings -->
+            <?php $this->render_conflict_warnings(); ?>
 
             <!-- Layout -->
             <div class="wpbl-layout">
@@ -547,6 +545,29 @@ class WPBL_Admin_UI {
     }
 
     // -------------------------------------------------------------------------
+    // Conflict warnings
+    // -------------------------------------------------------------------------
+
+    private function render_conflict_warnings(): void {
+        $conflicts = WPBL_Conflict_Detector::detect($this->settings);
+        if (empty($conflicts)) return;
+
+        foreach ($conflicts as $conflict) {
+            $class = 'wpbl-notice ';
+            if ($conflict['severity'] === 'critical') {
+                $class .= 'wpbl-notice-error';
+            } elseif ($conflict['severity'] === 'warning') {
+                $class .= 'wpbl-notice-warning';
+            } else {
+                $class .= 'wpbl-notice-info';
+            }
+            echo '<div class="' . esc_attr($class) . '">';
+            echo esc_html(wpbl_t($conflict['message_key']));
+            echo '</div>';
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // Module tab renderer
     // -------------------------------------------------------------------------
 
@@ -630,6 +651,15 @@ class WPBL_Admin_UI {
                     </label>
                     <?php endif; ?>
                     <input type="text" id="<?php echo esc_attr($key); ?>" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr((string) $value); ?>" class="wpbl-color-field" data-default-color="<?php echo esc_attr($field['default'] ?? '#000000'); ?>">
+                    <?php if ($desc): ?><span class="wpbl-setting-desc"><?php echo wp_kses_post($desc); ?></span><?php endif; ?>
+                </div>
+
+            <?php elseif ($type === 'datetime'): ?>
+                <div class="wpbl-setting-info">
+                    <label class="wpbl-setting-label" for="<?php echo esc_attr($key); ?>">
+                        <?php echo esc_html($label); ?>
+                    </label>
+                    <input type="datetime-local" id="<?php echo esc_attr($key); ?>" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr((string) $value); ?>">
                     <?php if ($desc): ?><span class="wpbl-setting-desc"><?php echo wp_kses_post($desc); ?></span><?php endif; ?>
                 </div>
 

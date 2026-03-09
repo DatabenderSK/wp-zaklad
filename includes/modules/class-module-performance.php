@@ -51,7 +51,7 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
                 'desc'  => wpbl_t('revisions_limit_desc'),
                 'min'  => -1,
             ],
-            ['key' => 'wpzaklad_disable_dashicons', 'type' => 'checkbox', 'label' => wpbl_t('disable_dashicons_label'), 'desc' => wpbl_t('disable_dashicons_desc'), 'recommended' => true],
+            ['key' => 'wpzaklad_disable_dashicons', 'type' => 'checkbox', 'label' => wpbl_t('disable_dashicons_label'), 'desc' => wpbl_t('disable_dashicons_desc'), 'recommended' => true, 'mine' => true],
         ];
     }
 

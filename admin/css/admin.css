@@ -84,6 +84,18 @@
     color: #b01c1e;
 }
 
+.wpbl-notice-warning {
+    background: #fff3cd;
+    border: 1px solid #f0c040;
+    color: #7a5000;
+}
+
+.wpbl-notice-info {
+    background: #e8f4fd;
+    border: 1px solid #72aee6;
+    color: #1d4ed8;
+}
+
 /* Main layout: sidebar + content */
 .wpbl-layout {
     display: flex;

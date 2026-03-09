@@ -3,7 +3,7 @@
  * Plugin Name:  WP Základ
  * Plugin URI:   https://github.com/DatabenderSK/wp-zaklad/
  * Description:  Baseline configuration for every WordPress site. Optimizes, secures and customizes WP out of the box with a modular, translatable settings panel.
- * Version:      1.0.8
+ * Version:      1.1.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author:       Martin Pavlič
@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
 // -------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------
-define('WPBL_VERSION',  '1.0.8');
+define('WPBL_VERSION',  '1.1.0');
 define('WPBL_DIR',      plugin_dir_path(__FILE__));
 define('WPBL_URL',      plugin_dir_url(__FILE__));
 define('WPBL_BASENAME', plugin_basename(__FILE__));
@@ -86,7 +86,7 @@ add_action('plugins_loaded', static function (): void {
                 'wpzaklad_disable_self_pingbacks'  => 1,
                 'wpzaklad_noindex_search'          => 1,
                 'wpzaklad_noindex_archives'        => 0,
-                'wpzaklad_remove_feed_links'       => 0,
+
                 'wpzaklad_hide_wp_version'         => 1,
                 'wpzaklad_disable_file_edit'       => 0,
                 'wpzaklad_disable_rest_unauth'     => 0,
@@ -117,6 +117,14 @@ add_action('plugins_loaded', static function (): void {
     if (get_option('wpzaklad_language') === false) {
         update_option('wpzaklad_language', get_option('wpbl_language', 'sk'), false);
     }
+
+    // Migrate remove_feed_links (SEO duplicate) → remove_rss (Optimization)
+    $settings = get_option(WPBL_Settings::OPTION_KEY, []);
+    if (is_array($settings) && !empty($settings['wpzaklad_remove_feed_links'])) {
+        $settings['wpzaklad_remove_rss'] = 1;
+        unset($settings['wpzaklad_remove_feed_links']);
+        update_option(WPBL_Settings::OPTION_KEY, $settings, false);
+    }
 }, 1);
 
 // -------------------------------------------------------------------------
@@ -146,7 +154,7 @@ register_activation_hook(__FILE__, static function (): void {
                 'wpzaklad_disable_self_pingbacks'  => 1,
                 'wpzaklad_noindex_search'          => 1,
                 'wpzaklad_noindex_archives'        => 0,
-                'wpzaklad_remove_feed_links'       => 0,
+
                 'wpzaklad_hide_wp_version'         => 1,
                 'wpzaklad_disable_file_edit'       => 0,
                 'wpzaklad_disable_rest_unauth'     => 0,

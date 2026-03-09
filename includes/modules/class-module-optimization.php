@@ -19,22 +19,24 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
             'wpzaklad_lazy_load_iframes'      => 0,
             'wpzaklad_disable_gravatars'      => 0,
             'wpzaklad_local_avatars'          => 0,
+            'wpzaklad_disable_admin_emails'   => 0,
         ];
     }
 
     public function get_fields(): array {
         return [
-            ['key' => 'wpzaklad_disable_emoji',          'type' => 'checkbox', 'label' => wpbl_t('disable_emoji_label'),          'desc' => wpbl_t('disable_emoji_desc'),          'recommended' => true],
+            ['key' => 'wpzaklad_disable_emoji',          'type' => 'checkbox', 'label' => wpbl_t('disable_emoji_label'),          'desc' => wpbl_t('disable_emoji_desc'),          'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_disable_embeds',         'type' => 'checkbox', 'label' => wpbl_t('disable_embeds_label'),         'desc' => wpbl_t('disable_embeds_desc')],
             ['key' => 'wpzaklad_remove_rss',             'type' => 'checkbox', 'label' => wpbl_t('remove_rss_label'),             'desc' => wpbl_t('remove_rss_desc')],
-            ['key' => 'wpzaklad_disable_xmlrpc',         'type' => 'checkbox', 'label' => wpbl_t('disable_xmlrpc_label'),         'desc' => wpbl_t('disable_xmlrpc_desc'),         'recommended' => true],
-            ['key' => 'wpzaklad_remove_jquery_migrate',  'type' => 'checkbox', 'label' => wpbl_t('remove_jquery_migrate_label'),  'desc' => wpbl_t('remove_jquery_migrate_desc'),  'recommended' => true],
-            ['key' => 'wpzaklad_disable_self_pingbacks', 'type' => 'checkbox', 'label' => wpbl_t('disable_self_pingbacks_label'), 'desc' => wpbl_t('disable_self_pingbacks_desc'), 'recommended' => true],
-            ['key' => 'wpzaklad_clean_head',             'type' => 'checkbox', 'label' => wpbl_t('clean_head_label'),             'desc' => wpbl_t('clean_head_desc'),             'recommended' => true],
-            ['key' => 'wpzaklad_block_update_emails',    'type' => 'checkbox', 'label' => wpbl_t('block_update_emails_label'),    'desc' => wpbl_t('block_update_emails_desc'),    'recommended' => true],
+            ['key' => 'wpzaklad_disable_xmlrpc',         'type' => 'checkbox', 'label' => wpbl_t('disable_xmlrpc_label'),         'desc' => wpbl_t('disable_xmlrpc_desc'),         'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_remove_jquery_migrate',  'type' => 'checkbox', 'label' => wpbl_t('remove_jquery_migrate_label'),  'desc' => wpbl_t('remove_jquery_migrate_desc'),  'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_disable_self_pingbacks', 'type' => 'checkbox', 'label' => wpbl_t('disable_self_pingbacks_label'), 'desc' => wpbl_t('disable_self_pingbacks_desc'), 'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_clean_head',             'type' => 'checkbox', 'label' => wpbl_t('clean_head_label'),             'desc' => wpbl_t('clean_head_desc'),             'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_block_update_emails',    'type' => 'checkbox', 'label' => wpbl_t('block_update_emails_label'),    'desc' => wpbl_t('block_update_emails_desc'),    'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_lazy_load_iframes',      'type' => 'checkbox', 'label' => wpbl_t('lazy_load_iframes_label'),      'desc' => wpbl_t('lazy_load_iframes_desc')],
-            ['key' => 'wpzaklad_disable_gravatars',      'type' => 'checkbox', 'label' => wpbl_t('disable_gravatars_label'),      'desc' => wpbl_t('disable_gravatars_desc')],
+            ['key' => 'wpzaklad_disable_gravatars',      'type' => 'checkbox', 'label' => wpbl_t('disable_gravatars_label'),      'desc' => wpbl_t('disable_gravatars_desc'), 'mine' => true],
             ['key' => 'wpzaklad_local_avatars',          'type' => 'checkbox', 'label' => wpbl_t('local_avatars_label'),          'desc' => wpbl_t('local_avatars_desc')],
+            ['key' => 'wpzaklad_disable_admin_emails', 'type' => 'checkbox', 'label' => wpbl_t('disable_admin_emails_label'), 'desc' => wpbl_t('disable_admin_emails_desc'), 'mine' => true],
         ];
     }
 
@@ -78,6 +80,12 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
             add_action('personal_options_update',    [$this, 'save_user_avatar_field']);
             add_action('edit_user_profile_update',   [$this, 'save_user_avatar_field']);
             add_action('admin_enqueue_scripts',      [$this, 'enqueue_avatar_scripts']);
+        }
+        if ($this->get('wpzaklad_disable_admin_emails')) {
+            add_filter('send_password_change_email', '__return_false');
+            add_filter('send_email_change_email', '__return_false');
+            add_filter('wp_new_user_notification_email_admin', '__return_false');
+            add_filter('admin_email_check_interval', '__return_false');
         }
     }
 
@@ -164,7 +172,7 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
     }
 
     public function lazy_load_iframes(string $content): string {
-        return str_replace('<iframe ', '<iframe loading="lazy" ', $content);
+        return preg_replace('/<iframe(?![^>]*loading\s*=)([^>]*)>/i', '<iframe loading="lazy"$1>', $content);
     }
 
     // -------------------------------------------------------------------------

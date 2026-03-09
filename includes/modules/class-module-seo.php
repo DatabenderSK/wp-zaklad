@@ -13,31 +13,35 @@ class WPBL_Module_Seo extends WPBL_Module_Base {
             'wpzaklad_noindex_paginated'       => 0,
             'wpzaklad_redirect_attachments'    => 0,
             'wpzaklad_open_graph'              => 0,
-            'wpzaklad_remove_feed_links'       => 0,
             'wpzaklad_custom_robots_txt'       => '',
+            'wpzaklad_disable_wp_sitemap'      => 0,
         ];
     }
 
     public function get_fields(): array {
         return [
-            ['key' => 'wpzaklad_noindex_search',         'type' => 'checkbox', 'label' => wpbl_t('noindex_search_label'),       'desc' => wpbl_t('noindex_search_desc'),       'recommended' => true],
+            ['key' => 'wpzaklad_noindex_search',         'type' => 'checkbox', 'label' => wpbl_t('noindex_search_label'),       'desc' => wpbl_t('noindex_search_desc'),       'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_noindex_archives',        'type' => 'checkbox', 'label' => wpbl_t('noindex_archives_label'),     'desc' => wpbl_t('noindex_archives_desc')],
-            ['key' => 'wpzaklad_noindex_paginated',       'type' => 'checkbox', 'label' => wpbl_t('noindex_paginated_label'),    'desc' => wpbl_t('noindex_paginated_desc'),    'recommended' => true],
-            ['key' => 'wpzaklad_redirect_attachments',    'type' => 'checkbox', 'label' => wpbl_t('redirect_attachments_label'), 'desc' => wpbl_t('redirect_attachments_desc'), 'recommended' => true],
+            ['key' => 'wpzaklad_noindex_paginated',       'type' => 'checkbox', 'label' => wpbl_t('noindex_paginated_label'),    'desc' => wpbl_t('noindex_paginated_desc'),    'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_redirect_attachments',    'type' => 'checkbox', 'label' => wpbl_t('redirect_attachments_label'), 'desc' => wpbl_t('redirect_attachments_desc'), 'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_open_graph',              'type' => 'checkbox', 'label' => wpbl_t('open_graph_label'),           'desc' => wpbl_t('open_graph_desc')],
-            ['key' => 'wpzaklad_remove_feed_links',       'type' => 'checkbox', 'label' => wpbl_t('remove_feed_links_label'),   'desc' => wpbl_t('remove_feed_links_desc')],
             ['key' => 'wpzaklad_custom_robots_txt',       'type' => 'textarea', 'label' => wpbl_t('custom_robots_txt_label'),   'desc' => wpbl_t('custom_robots_txt_desc'),   'sanitize' => 'raw'],
+            ['key' => 'wpzaklad_disable_wp_sitemap',      'type' => 'checkbox', 'label' => wpbl_t('disable_wp_sitemap_label'), 'desc' => wpbl_t('disable_wp_sitemap_desc'), 'recommended' => true, 'mine' => true],
         ];
     }
 
     public function init(): void {
-        if ($this->get('wpzaklad_noindex_search') || $this->get('wpzaklad_noindex_archives') || $this->get('wpzaklad_noindex_paginated')) {
-            add_action('wp_head', [$this, 'output_noindex'], 1);
-        }
+        $seo_plugin_active = defined('RANK_MATH_VERSION') || defined('WPSEO_VERSION') || defined('AIOSEO_VERSION');
 
-        if ($this->get('wpzaklad_remove_feed_links')) {
-            remove_action('wp_head', 'feed_links', 2);
-            remove_action('wp_head', 'feed_links_extra', 3);
+        if (!$seo_plugin_active) {
+            if ($this->get('wpzaklad_noindex_search') || $this->get('wpzaklad_noindex_archives') || $this->get('wpzaklad_noindex_paginated')) {
+                add_action('wp_head', [$this, 'output_noindex'], 1);
+            }
+
+            $robots_txt = (string) $this->get('wpzaklad_custom_robots_txt');
+            if ($robots_txt !== '') {
+                add_filter('robots_txt', fn() => $robots_txt);
+            }
         }
 
         if ($this->get('wpzaklad_redirect_attachments')) {
@@ -48,9 +52,21 @@ class WPBL_Module_Seo extends WPBL_Module_Base {
             add_action('wp_head', [$this, 'output_open_graph'], 5);
         }
 
-        $robots_txt = (string) $this->get('wpzaklad_custom_robots_txt');
-        if ($robots_txt !== '') {
-            add_filter('robots_txt', fn() => $robots_txt);
+        if ($this->get('wpzaklad_disable_wp_sitemap')) {
+            add_filter('wp_sitemaps_enabled', '__return_false');
+        }
+    }
+
+    public function render_custom_tab(): void {
+        $seo_plugin = '';
+        if (defined('RANK_MATH_VERSION')) $seo_plugin = 'RankMath';
+        elseif (defined('WPSEO_VERSION')) $seo_plugin = 'Yoast SEO';
+        elseif (defined('AIOSEO_VERSION')) $seo_plugin = 'All in One SEO';
+
+        if ($seo_plugin) {
+            echo '<div class="wpbl-notice wpbl-notice-info" style="margin-top:12px;">';
+            echo esc_html(sprintf(wpbl_t('seo_plugin_active_notice'), $seo_plugin));
+            echo '</div>';
         }
     }
 

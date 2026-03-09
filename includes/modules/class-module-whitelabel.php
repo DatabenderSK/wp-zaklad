@@ -23,6 +23,7 @@ class WPBL_Module_Whitelabel extends WPBL_Module_Base {
                 'label'       => wpbl_t('hide_wp_logo_label'),
                 'desc'        => wpbl_t('hide_wp_logo_desc'),
                 'recommended' => true,
+                'mine'        => true,
             ],
             [
                 'key'      => 'wpzaklad_admin_footer_text',
@@ -37,6 +38,7 @@ class WPBL_Module_Whitelabel extends WPBL_Module_Base {
                 'label'       => wpbl_t('hide_howdy_label'),
                 'desc'        => wpbl_t('hide_howdy_desc'),
                 'recommended' => true,
+                'mine'        => true,
             ],
             [
                 'key'   => 'wpzaklad_hide_frontend_bar',

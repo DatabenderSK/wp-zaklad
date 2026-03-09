@@ -15,7 +15,7 @@ class WPBL_Module_System extends WPBL_Module_Base {
 
     public function get_fields(): array {
         return [
-            ['key' => 'wpzaklad_sysinfo_widget',   'type' => 'checkbox', 'label' => wpbl_t('sysinfo_widget_label'),   'desc' => wpbl_t('sysinfo_widget_desc')],
+            ['key' => 'wpzaklad_sysinfo_widget',   'type' => 'checkbox', 'label' => wpbl_t('sysinfo_widget_label'),   'desc' => wpbl_t('sysinfo_widget_desc'), 'mine' => true],
             ['key' => 'wpzaklad_track_last_login',  'type' => 'checkbox', 'label' => wpbl_t('track_last_login_label'), 'desc' => wpbl_t('track_last_login_desc')],
         ];
     }

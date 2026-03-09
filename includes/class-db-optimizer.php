@@ -117,11 +117,21 @@ class WPBL_DB_Optimizer {
                 return $wpdb->rows_affected;
 
             case 'orphan_postmeta':
-                return (int) $wpdb->query(
-                    "DELETE pm FROM {$wpdb->postmeta} pm
-                     LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-                     WHERE p.ID IS NULL"
-                );
+                $total = 0;
+                do {
+                    $deleted = (int) $wpdb->query(
+                        "DELETE FROM {$wpdb->postmeta} WHERE meta_id IN (
+                            SELECT meta_id FROM (
+                                SELECT pm.meta_id FROM {$wpdb->postmeta} pm
+                                LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+                                WHERE p.ID IS NULL
+                                LIMIT 5000
+                            ) AS orphans
+                        )"
+                    );
+                    $total += $deleted;
+                } while ($deleted > 0);
+                return $total;
         }
 
         return 0;

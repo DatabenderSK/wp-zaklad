@@ -65,11 +65,11 @@ return [
     'disable_file_edit_label'       => 'Vypnúť editor súborov v administrácii',
     'disable_file_edit_desc'        => 'Skryje editor tém a pluginov – bezpečnostné odporúčanie pre produkčné weby.',
     'disable_rest_unauth_label'     => 'Vypnúť REST API pre neprihlásených',
-    'disable_rest_unauth_desc'      => 'REST API je rozhranie cez ktoré WordPress komunikuje s inými aplikáciami. Toto nastavenie zablokuje celý prístup pre neprihlásených. <strong>Pozor:</strong> môže rozbiť Contact Form 7, Elementor a iné pluginy ktoré REST API používajú. Bezpečnejšia voľba je skryť iba users endpoint (nastavenie nižšie).',
+    'disable_rest_unauth_desc'      => 'REST API je rozhranie cez ktoré WordPress komunikuje s inými aplikáciami. Toto nastavenie zablokuje prístup pre neprihlásených, ale automaticky povolí známe pluginy (Fluent Forms, CF7, WPForms, GenerateBlocks). Bezpečnejšia voľba je skryť iba users endpoint (nastavenie nižšie).',
     'disable_user_rest_label'       => 'Skryť používateľov cez REST API a archívy autorov',
     'disable_user_rest_desc'        => 'Endpoint /wp/v2/users verejne vystavuje prihlasovacie mená adminov a archívy autorov ich odhaľujú ďalej. Uzavrie oboje bez vplyvu na ostatné pluginy.',
     'security_headers_label'        => 'Bezpečnostné HTTP hlavičky',
-    'security_headers_desc'         => 'Pridá tri ochranné hlavičky: zabraňuje vkladaniu webu do iframe iných stránok (clickjacking), zabraňuje zneužitiu MIME typov, a kontroluje odosielanie Referer informácií.',
+    'security_headers_desc'         => 'Pridá ochranné HTTP hlavičky: zabraňuje vkladaniu do iframe (clickjacking), MIME-type sniffing, kontroluje Referer, blokuje prístup ku kamere/mikrofónu/geolokácii a aktivuje XSS filter prehliadača.',
 
     // Appearance
     'custom_login_logo_label'       => 'Vlastné logo na prihlasovacej stránke',
@@ -356,4 +356,31 @@ return [
     'local_avatar_select'            => 'Použiť túto fotku',
     'local_avatar_remove'            => 'Odstrániť fotku',
     'local_avatar_field_desc'        => 'Nahraná fotka nahradí Gravatar na celom webe.',
+
+    // Conflict detector
+    'conflict_gutenberg_generateblocks' => 'Konflikt: „Vypnúť Gutenberg" je zapnuté, ale GenerateBlocks vyžaduje block editor. Gutenberg bude pre GenerateBlocks nefunkčný.',
+    'conflict_rest_fluentforms'         => 'Konflikt: „Vypnúť REST API pre neprihlásených" je zapnuté, ale Fluent Forms vyžaduje REST API. Formuláre pre návštevníkov nebudú fungovať.',
+    'conflict_rest_cf7'                 => 'Upozornenie: „Vypnúť REST API pre neprihlásených" je zapnuté. Contact Form 7 REST endpointy sú automaticky povolené.',
+    'conflict_robots_rankmath'          => 'Info: Vlastný robots.txt je nastavený, ale RankMath tiež spravuje robots.txt. Môžu sa vzájomne prepísať.',
+
+    // SEO – disable WP sitemap
+    'disable_wp_sitemap_label'          => 'Vypnúť WP sitemap',
+    'disable_wp_sitemap_desc'           => 'Vypne predvolenú WordPress sitemap (wp-sitemap.xml). Zbytočná keď RankMath alebo Yoast SEO generuje vlastnú sitemap.',
+
+    // SEO – plugin active notice
+    'seo_plugin_active_notice'          => '%s je aktívny. SEO nastavenia (noindex, robots.txt) sú automaticky delegované na SEO plugin.',
+
+    // Optimization – disable admin emails
+    'disable_admin_emails_label'        => 'Vypnúť admin notifikačné emaily',
+    'disable_admin_emails_desc'         => 'Zastaví emaily o zmene hesla, zmene emailu, novom používateľovi a overenie admin emailu. Dopĺňa „Blokovať update emaily" (ten blokuje len auto-update emaily).',
+
+    // Appearance – login bg color
+    'login_bg_color_label'              => 'Farba pozadia prihlasovacej stránky',
+    'login_bg_color_desc'               => 'Nastaví farbu pozadia prihlasovacej stránky. Nechaj prázdne pre predvolené správanie.',
+
+    // Maintenance – scheduled
+    'maintenance_start_label'           => 'Začiatok údržby',
+    'maintenance_start_desc'            => 'Nepovinné. Maintenance mode sa aktivuje až od tohto dátumu a času. Nechaj prázdne pre okamžitú aktiváciu.',
+    'maintenance_end_label'             => 'Koniec údržby',
+    'maintenance_end_desc'              => 'Nepovinné. Maintenance mode sa automaticky vypne po tomto dátume a čase. Nechaj prázdne pre manuálne vypnutie.',
 ];

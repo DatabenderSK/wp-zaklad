@@ -12,6 +12,8 @@ class WPBL_Module_Maintenance extends WPBL_Module_Base {
             'wpzaklad_maintenance_headline' => 'Stránka je dočasne nedostupná',
             'wpzaklad_maintenance_text'     => 'Pracujeme na aktualizácii. Čoskoro budeme späť.',
             'wpzaklad_maintenance_bg'       => '#1a1a2e',
+            'wpzaklad_maintenance_start'    => '',
+            'wpzaklad_maintenance_end'      => '',
         ];
     }
 
@@ -42,11 +44,43 @@ class WPBL_Module_Maintenance extends WPBL_Module_Base {
                 'desc'    => wpbl_t('maintenance_bg_desc'),
                 'default' => '#1a1a2e',
             ],
+            [
+                'key'   => 'wpzaklad_maintenance_start',
+                'type'  => 'datetime',
+                'label' => wpbl_t('maintenance_start_label'),
+                'desc'  => wpbl_t('maintenance_start_desc'),
+            ],
+            [
+                'key'   => 'wpzaklad_maintenance_end',
+                'type'  => 'datetime',
+                'label' => wpbl_t('maintenance_end_label'),
+                'desc'  => wpbl_t('maintenance_end_desc'),
+            ],
         ];
     }
 
     public function init(): void {
         if ($this->get('wpzaklad_maintenance_mode')) {
+            // Check scheduled time window
+            $start = $this->get('wpzaklad_maintenance_start');
+            $end   = $this->get('wpzaklad_maintenance_end');
+            $now   = current_time('Y-m-d\TH:i');
+
+            // If start is set and we haven't reached it yet, skip
+            if ($start !== '' && $now < $start) {
+                return;
+            }
+
+            // If end is set and has passed, auto-disable maintenance mode
+            if ($end !== '' && $now > $end) {
+                $settings = get_option('wpzaklad_settings', []);
+                if (is_array($settings)) {
+                    $settings['wpzaklad_maintenance_mode'] = 0;
+                    update_option('wpzaklad_settings', $settings, false);
+                }
+                return;
+            }
+
             add_action('template_redirect', [$this, 'maintenance_page']);
         }
     }
@@ -70,7 +104,7 @@ class WPBL_Module_Maintenance extends WPBL_Module_Base {
         header('Content-Type: text/html; charset=utf-8');
         ?>
         <!DOCTYPE html>
-        <html lang="sk">
+        <html lang="<?php echo esc_attr(get_bloginfo('language')); ?>">
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">

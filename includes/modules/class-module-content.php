@@ -23,12 +23,12 @@ class WPBL_Module_Content extends WPBL_Module_Base {
 
     public function get_fields(): array {
         return [
-            ['key' => 'wpzaklad_disable_comments',       'type' => 'checkbox', 'label' => wpbl_t('disable_comments_label'),          'desc' => wpbl_t('disable_comments_desc'),          'recommended' => true],
+            ['key' => 'wpzaklad_disable_comments',       'type' => 'checkbox', 'label' => wpbl_t('disable_comments_label'),          'desc' => wpbl_t('disable_comments_desc'),          'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_disable_gutenberg',      'type' => 'checkbox', 'label' => wpbl_t('disable_gutenberg_label'),         'desc' => wpbl_t('disable_gutenberg_desc')],
-            ['key' => 'wpzaklad_allow_svg',              'type' => 'checkbox', 'label' => wpbl_t('allow_svg_label'),                 'desc' => wpbl_t('allow_svg_desc')],
-            ['key' => 'wpzaklad_lowercase_filenames',    'type' => 'checkbox', 'label' => wpbl_t('lowercase_filenames_label'),       'desc' => wpbl_t('lowercase_filenames_desc')],
-            ['key' => 'wpzaklad_year_shortcode',         'type' => 'checkbox', 'label' => wpbl_t('year_shortcode_label'),            'desc' => wpbl_t('year_shortcode_desc')],
-            ['key' => 'wpzaklad_search_title_shortcode', 'type' => 'checkbox', 'label' => wpbl_t('search_title_shortcode_label'),    'desc' => wpbl_t('search_title_shortcode_desc')],
+            ['key' => 'wpzaklad_allow_svg',              'type' => 'checkbox', 'label' => wpbl_t('allow_svg_label'),                 'desc' => wpbl_t('allow_svg_desc'), 'mine' => true],
+            ['key' => 'wpzaklad_lowercase_filenames',    'type' => 'checkbox', 'label' => wpbl_t('lowercase_filenames_label'),       'desc' => wpbl_t('lowercase_filenames_desc'), 'mine' => true],
+            ['key' => 'wpzaklad_year_shortcode',         'type' => 'checkbox', 'label' => wpbl_t('year_shortcode_label'),            'desc' => wpbl_t('year_shortcode_desc'), 'mine' => true],
+            ['key' => 'wpzaklad_search_title_shortcode', 'type' => 'checkbox', 'label' => wpbl_t('search_title_shortcode_label'),    'desc' => wpbl_t('search_title_shortcode_desc'), 'mine' => true],
             ['key' => 'wpzaklad_clean_block_editor',     'type' => 'checkbox', 'label' => wpbl_t('clean_block_editor_label'),        'desc' => wpbl_t('clean_block_editor_desc')],
             ['key' => 'wpzaklad_disable_archives',       'type' => 'checkbox', 'label' => wpbl_t('disable_archives_label'),          'desc' => wpbl_t('disable_archives_desc')],
             ['key' => 'wpzaklad_clean_archive_titles',   'type' => 'checkbox', 'label' => wpbl_t('clean_archive_titles_label'),      'desc' => wpbl_t('clean_archive_titles_desc')],

@@ -157,6 +157,12 @@ class WPBL_Admin_UI {
             .wpbl-widget-section li{font-size:12px;color:#646970;margin-bottom:2px;}
             .wpbl-widget-section li strong{font-size:12px;color:#1d2327;font-weight:600;}
             .wpbl-widget-footer{margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f1;}
+            .wpbl-manager-name{font-size:14px;font-weight:600;color:#1d2327;margin:0 0 8px;}
+            .wpbl-manager-contacts{margin:0;padding:0;list-style:none;}
+            .wpbl-manager-contacts li{font-size:13px;color:#646970;margin-bottom:4px;}
+            .wpbl-manager-contacts a{text-decoration:none;color:#2271b1;}
+            .wpbl-manager-contacts a:hover{color:#135e96;}
+            .wpbl-manager-booking{margin:10px 0 0;padding-top:10px;border-top:1px solid #f0f0f1;}
         ';
         wp_add_inline_style('wp-admin', $css);
     }
@@ -491,6 +497,10 @@ class WPBL_Admin_UI {
 
                 </div><!-- .wpbl-content -->
             </div><!-- .wpbl-layout -->
+
+            <p class="wpbl-plugin-credit">
+                WP Základ by <a href="https://martinpavlic.sk/" target="_blank" rel="noopener">Martin Pavlič</a>
+            </p>
         </div><!-- .wpbl-wrap -->
         <?php
     }

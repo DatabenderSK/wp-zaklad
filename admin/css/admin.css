@@ -528,6 +528,24 @@
     width: 100%;
 }
 
+/* Plugin credit */
+.wpbl-plugin-credit {
+    text-align: center;
+    color: #a7aaad;
+    font-size: 12px;
+    margin: 20px 0 0;
+}
+
+.wpbl-plugin-credit a {
+    color: #a7aaad;
+    text-decoration: none;
+}
+
+.wpbl-plugin-credit a:hover {
+    color: #646970;
+    text-decoration: underline;
+}
+
 /* Responsive */
 @media (max-width: 782px) {
     .wpbl-layout {

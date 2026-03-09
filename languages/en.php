@@ -386,6 +386,19 @@ return [
     'duplicate_suffix'                  => '(copy)',
     'duplicate_error'                   => 'Duplication failed. You do not have permission or the post does not exist.',
 
+    // White Label – manager widget
+    'manager_widget_label'              => 'Website Manager dashboard widget',
+    'manager_widget_desc'               => 'Shows website manager contact info on the main dashboard. Fill in at least a name, email, or phone number.',
+    'manager_widget_title'              => 'Website Manager',
+    'manager_name_label'                => 'Manager Name',
+    'manager_email_label'               => 'Email',
+    'manager_phone_label'               => 'Phone',
+    'manager_url_label'                 => 'Website',
+    'manager_url_desc'                  => 'Your website URL (e.g. https://martinpavlic.sk).',
+    'manager_booking_label'             => 'Booking / Meeting Link',
+    'manager_booking_desc'              => 'URL to Calendly, Cal.com or a contact form. Leave empty if not needed.',
+    'manager_booking_btn'               => 'Schedule a meeting',
+
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Maintenance Start',
     'maintenance_start_desc'            => 'Optional. Maintenance mode activates from this date and time. Leave empty for immediate activation.',

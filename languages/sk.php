@@ -386,6 +386,19 @@ return [
     'duplicate_suffix'                  => '(kópia)',
     'duplicate_error'                   => 'Duplikácia zlyhala. Nemáte oprávnenie alebo príspevok neexistuje.',
 
+    // White Label – manager widget
+    'manager_widget_label'              => 'Widget „Správca webu" na dashboarde',
+    'manager_widget_desc'               => 'Zobrazí kontaktné údaje správcu webu na hlavnom dashboarde. Vyplň aspoň meno, email alebo telefón.',
+    'manager_widget_title'              => 'Správca webu',
+    'manager_name_label'                => 'Meno správcu',
+    'manager_email_label'               => 'E-mail',
+    'manager_phone_label'               => 'Telefón',
+    'manager_url_label'                 => 'Webová stránka',
+    'manager_url_desc'                  => 'URL vášho webu (napr. https://martinpavlic.sk).',
+    'manager_booking_label'             => 'Odkaz na plánovanie schôdzky',
+    'manager_booking_desc'              => 'URL na Calendly, Cal.com alebo kontaktný formulár. Nechaj prázdne ak nepotrebuješ.',
+    'manager_booking_btn'               => 'Naplánovať schôdzku',
+
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Začiatok údržby',
     'maintenance_start_desc'            => 'Nepovinné. Maintenance mode sa aktivuje až od tohto dátumu a času. Nechaj prázdne pre okamžitú aktiváciu.',

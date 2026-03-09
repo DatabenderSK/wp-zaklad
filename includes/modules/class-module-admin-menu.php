@@ -3,6 +3,9 @@ defined('ABSPATH') || exit;
 
 class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
 
+    /** @var array<string,string> Full menu snapshot (slug => label) taken before items are removed. */
+    private array $full_menu_cache = [];
+
     public function get_id(): string { return 'admin-menu'; }
 
     public function get_label(): string { return wpbl_t('tab_admin_menu'); }
@@ -19,7 +22,8 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
             add_action('admin_bar_menu', [$this, 'apply_toolbar'], 999);
         }
 
-        // Hide menu items for all users
+        // Cache the full menu before hiding, then hide
+        add_action('admin_menu', [$this, 'cache_full_menu'], 9998);
         add_action('admin_menu', [$this, 'apply_hidden_items'], 9999);
     }
 
@@ -34,13 +38,18 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
         $hidden_items = get_option('wpzaklad_admin_menu_hidden', []);
         $toolbar      = get_option('wpzaklad_admin_menu_toolbar', []);
 
-        // Build ordered menu items list
+        // Build menu items from the full cache (includes items before removal)
+        // Fall back to current $menu if cache is empty (e.g. first load)
         $menu_items = [];
-        foreach ($menu as $item) {
-            $slug  = $item[2] ?? '';
-            $label = wp_strip_all_tags($item[0] ?? '');
-            if ($slug === '') continue;
-            $menu_items[$slug] = $label;
+        if (!empty($this->full_menu_cache)) {
+            $menu_items = $this->full_menu_cache;
+        } else {
+            foreach ($menu as $item) {
+                $slug  = $item[2] ?? '';
+                $label = wp_strip_all_tags($item[0] ?? '');
+                if ($slug === '') continue;
+                $menu_items[$slug] = $label;
+            }
         }
 
         // Re-sort by saved order, append new items at end
@@ -364,8 +373,19 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
     }
 
     // -------------------------------------------------------------------------
-    // Apply hidden menu items (non-admins only)
+    // Cache full menu before hiding + apply hidden items
     // -------------------------------------------------------------------------
+
+    public function cache_full_menu(): void {
+        global $menu;
+        $this->full_menu_cache = [];
+        foreach ($menu as $item) {
+            $slug  = $item[2] ?? '';
+            $label = wp_strip_all_tags($item[0] ?? '');
+            if ($slug === '') continue;
+            $this->full_menu_cache[$slug] = $label;
+        }
+    }
 
     public function apply_hidden_items(): void {
         $hidden = get_option('wpzaklad_admin_menu_hidden', []);

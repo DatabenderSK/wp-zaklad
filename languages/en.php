@@ -379,6 +379,13 @@ return [
     'login_bg_color_label'              => 'Login Page Background Color',
     'login_bg_color_desc'               => 'Sets the background color of the login page. Leave empty for default behavior.',
 
+    // Content – duplicate posts
+    'duplicate_posts_label'             => 'Duplicate Posts & Pages',
+    'duplicate_posts_desc'              => 'Adds a "Duplicate" link to posts, pages and custom post types list. Copies content, all meta fields (ACF, RankMath, GenerateBlocks), and taxonomies. The copy is created as a draft.',
+    'duplicate_link'                    => 'Duplicate',
+    'duplicate_suffix'                  => '(copy)',
+    'duplicate_error'                   => 'Duplication failed. You do not have permission or the post does not exist.',
+
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Maintenance Start',
     'maintenance_start_desc'            => 'Optional. Maintenance mode activates from this date and time. Leave empty for immediate activation.',

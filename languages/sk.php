@@ -379,6 +379,13 @@ return [
     'login_bg_color_label'              => 'Farba pozadia prihlasovacej stránky',
     'login_bg_color_desc'               => 'Nastaví farbu pozadia prihlasovacej stránky. Nechaj prázdne pre predvolené správanie.',
 
+    // Content – duplicate posts
+    'duplicate_posts_label'             => 'Duplikácia príspevkov a stránok',
+    'duplicate_posts_desc'              => 'Pridá odkaz „Duplikovať" do zoznamu príspevkov, stránok a custom post typov. Skopíruje obsah, všetky meta polia (ACF, RankMath, GenerateBlocks), taxonomie. Kópia sa vytvorí ako koncept.',
+    'duplicate_link'                    => 'Duplikovať',
+    'duplicate_suffix'                  => '(kópia)',
+    'duplicate_error'                   => 'Duplikácia zlyhala. Nemáte oprávnenie alebo príspevok neexistuje.',
+
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Začiatok údržby',
     'maintenance_start_desc'            => 'Nepovinné. Maintenance mode sa aktivuje až od tohto dátumu a času. Nechaj prázdne pre okamžitú aktiváciu.',

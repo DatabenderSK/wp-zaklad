@@ -18,6 +18,7 @@ class WPBL_Module_Content extends WPBL_Module_Base {
             'wpzaklad_disable_archives'       => 0,
             'wpzaklad_clean_archive_titles'   => 0,
             'wpzaklad_disable_author_archive' => 0,
+            'wpzaklad_duplicate_posts'        => 0,
         ];
     }
 
@@ -33,6 +34,7 @@ class WPBL_Module_Content extends WPBL_Module_Base {
             ['key' => 'wpzaklad_disable_archives',       'type' => 'checkbox', 'label' => wpbl_t('disable_archives_label'),          'desc' => wpbl_t('disable_archives_desc')],
             ['key' => 'wpzaklad_clean_archive_titles',   'type' => 'checkbox', 'label' => wpbl_t('clean_archive_titles_label'),      'desc' => wpbl_t('clean_archive_titles_desc')],
             ['key' => 'wpzaklad_disable_author_archive', 'type' => 'checkbox', 'label' => wpbl_t('disable_author_archive_label'),    'desc' => wpbl_t('disable_author_archive_desc')],
+            ['key' => 'wpzaklad_duplicate_posts',        'type' => 'checkbox', 'label' => wpbl_t('duplicate_posts_label'),           'desc' => wpbl_t('duplicate_posts_desc'),           'recommended' => true, 'mine' => true],
         ];
     }
 
@@ -74,6 +76,11 @@ class WPBL_Module_Content extends WPBL_Module_Base {
         }
         if ($this->get('wpzaklad_disable_author_archive')) {
             add_action('template_redirect', [$this, 'redirect_author_archive']);
+        }
+        if ($this->get('wpzaklad_duplicate_posts')) {
+            add_filter('post_row_actions',  [$this, 'add_duplicate_link'], 10, 2);
+            add_filter('page_row_actions',  [$this, 'add_duplicate_link'], 10, 2);
+            add_action('admin_action_wpbl_duplicate_post', [$this, 'handle_duplicate']);
         }
     }
 
@@ -279,6 +286,81 @@ class WPBL_Module_Content extends WPBL_Module_Base {
 
     public function clean_archive_title(string $title): string {
         return preg_replace('/^[^:]+:\s*/', '', strip_tags($title));
+    }
+
+    // -------------------------------------------------------------------------
+    // Post duplication
+    // -------------------------------------------------------------------------
+
+    public function add_duplicate_link(array $actions, \WP_Post $post): array {
+        if (!current_user_can('edit_post', $post->ID)) {
+            return $actions;
+        }
+        $url = wp_nonce_url(
+            admin_url('admin.php?action=wpbl_duplicate_post&post_id=' . $post->ID),
+            'wpbl_duplicate_' . $post->ID
+        );
+        $actions['wpbl_duplicate'] = '<a href="' . esc_url($url) . '">' . esc_html(wpbl_t('duplicate_link')) . '</a>';
+        return $actions;
+    }
+
+    public function handle_duplicate(): void {
+        $post_id = (int) ($_GET['post_id'] ?? 0);
+        if (!$post_id || !current_user_can('edit_post', $post_id)) {
+            wp_die(esc_html(wpbl_t('duplicate_error')));
+        }
+        check_admin_referer('wpbl_duplicate_' . $post_id);
+
+        $original = get_post($post_id);
+        if (!$original) {
+            wp_die(esc_html(wpbl_t('duplicate_error')));
+        }
+
+        // 1. Insert new post (as draft)
+        $new_id = wp_insert_post([
+            'post_type'      => $original->post_type,
+            'post_title'     => $original->post_title . ' ' . wpbl_t('duplicate_suffix'),
+            'post_content'   => $original->post_content,
+            'post_excerpt'   => $original->post_excerpt,
+            'post_author'    => get_current_user_id(),
+            'post_status'    => 'draft',
+            'post_parent'    => $original->post_parent,
+            'menu_order'     => $original->menu_order,
+            'post_password'  => $original->post_password,
+            'comment_status' => $original->comment_status,
+            'ping_status'    => $original->ping_status,
+        ]);
+
+        if (is_wp_error($new_id) || !$new_id) {
+            wp_die(esc_html(wpbl_t('duplicate_error')));
+        }
+
+        // 2. Copy all post meta (ACF, RankMath, GenerateBlocks, custom fields...)
+        $skip_meta = ['_edit_lock', '_edit_last', '_wp_old_slug', '_wp_old_date'];
+        $all_meta  = get_post_meta($post_id);
+
+        foreach ($all_meta as $meta_key => $meta_values) {
+            if (in_array($meta_key, $skip_meta, true)) {
+                continue;
+            }
+            foreach ($meta_values as $meta_value) {
+                add_post_meta($new_id, $meta_key, maybe_unserialize($meta_value));
+            }
+        }
+
+        // 3. Copy all taxonomies (categories, tags, custom taxonomies)
+        $taxonomies = get_object_taxonomies($original->post_type);
+        foreach ($taxonomies as $taxonomy) {
+            $terms = wp_get_object_terms($post_id, $taxonomy, ['fields' => 'ids']);
+            if (!is_wp_error($terms) && !empty($terms)) {
+                wp_set_object_terms($new_id, $terms, $taxonomy);
+            }
+        }
+
+        do_action('wpzaklad_post_duplicated', $new_id, $post_id);
+
+        wp_safe_redirect(admin_url('post.php?action=edit&post=' . $new_id));
+        exit;
     }
 
     private function disable_comments(): void {

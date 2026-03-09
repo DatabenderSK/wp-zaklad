@@ -3,7 +3,7 @@
  * Plugin Name:  WP Základ
  * Plugin URI:   https://github.com/DatabenderSK/wp-zaklad/
  * Description:  Baseline configuration for every WordPress site. Optimizes, secures and customizes WP out of the box with a modular, translatable settings panel.
- * Version:      1.1.1
+ * Version:      1.2.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author:       Martin Pavlič
@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
 // -------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------
-define('WPBL_VERSION',  '1.1.1');
+define('WPBL_VERSION',  '1.2.0');
 define('WPBL_DIR',      plugin_dir_path(__FILE__));
 define('WPBL_URL',      plugin_dir_url(__FILE__));
 define('WPBL_BASENAME', plugin_basename(__FILE__));

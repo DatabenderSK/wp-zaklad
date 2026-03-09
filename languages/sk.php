@@ -470,6 +470,12 @@ return [
     'force_font_swap_desc'              => 'Vynúti <code>font-display:swap</code> na všetky @font-face deklarácie v &lt;head&gt;. Text sa zobrazí okamžite systémovým fontom a po načítaní sa nahradí vlastným.',
     'preload_fonts_label'               => 'Preload fonty (URL)',
     'preload_fonts_desc'                => 'URL fonty súborov na preloadovanie – jeden na riadok. Typ sa detekuje automaticky (woff2, woff, ttf). Napr. <code>/wp-content/fonts/inter.woff2</code>.',
+    'critical_css_label'                => 'Critical CSS',
+    'critical_css_desc'                 => 'Vloží inline CSS pre above-the-fold obsah priamo do &lt;head&gt;. Prehliadač vykreslí stránku okamžite bez čakania na externé CSS súbory. Najlepšie funguje v kombinácii s Async CSS.',
+    'critical_css_all_pages_label'      => 'Critical CSS na všetkých stránkach',
+    'critical_css_all_pages_desc'       => 'Predvolene sa Critical CSS aplikuje len na homepage. Zapni ak má rovnaký layout na všetkých stránkach.',
+    'critical_css_code_label'           => 'Critical CSS kód',
+    'critical_css_code_desc'            => 'CSS pravidlá pre above-the-fold obsah (header, hero sekcia, navigácia). Vygeneruj cez DevTools → Coverage tab alebo online nástroj (napr. kriticalcss.com).',
 
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Začiatok údržby',

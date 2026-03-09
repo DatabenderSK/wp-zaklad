@@ -26,6 +26,9 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             'wpzaklad_hero_preload_url'         => '',
             'wpzaklad_force_font_swap'          => 0,
             'wpzaklad_preload_fonts'            => '',
+            'wpzaklad_critical_css'             => 0,
+            'wpzaklad_critical_css_code'        => '',
+            'wpzaklad_critical_css_all_pages'   => 0,
         ];
     }
 
@@ -82,6 +85,9 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             ['key' => 'wpzaklad_hero_preload_url',   'type' => 'text',      'label' => wpbl_t('hero_preload_url_label'),   'desc' => wpbl_t('hero_preload_url_desc'),   'new' => true],
             ['key' => 'wpzaklad_force_font_swap',    'type' => 'checkbox',  'label' => wpbl_t('force_font_swap_label'),    'desc' => wpbl_t('force_font_swap_desc'),    'recommended' => true, 'mine' => true, 'new' => true],
             ['key' => 'wpzaklad_preload_fonts',      'type' => 'textarea',  'label' => wpbl_t('preload_fonts_label'),      'desc' => wpbl_t('preload_fonts_desc'),      'new' => true],
+            ['key' => 'wpzaklad_critical_css',          'type' => 'checkbox',  'label' => wpbl_t('critical_css_label'),          'desc' => wpbl_t('critical_css_desc'),          'recommended' => true, 'mine' => true, 'new' => true],
+            ['key' => 'wpzaklad_critical_css_all_pages', 'type' => 'checkbox', 'label' => wpbl_t('critical_css_all_pages_label'), 'desc' => wpbl_t('critical_css_all_pages_desc')],
+            ['key' => 'wpzaklad_critical_css_code',     'type' => 'textarea',  'label' => wpbl_t('critical_css_code_label'),     'desc' => wpbl_t('critical_css_code_desc')],
         ];
     }
 
@@ -174,6 +180,16 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
                 add_filter('script_loader_tag', [$this, 'delay_scripts'], 11, 3);
                 add_action('wp_footer', [$this, 'render_delay_loader'], 999);
             }
+        }
+
+        // Critical CSS (inline above-the-fold CSS)
+        $critical_css = trim((string) $this->get('wpzaklad_critical_css_code'));
+        if ($this->get('wpzaklad_critical_css') && $critical_css !== '' && !is_admin()) {
+            $critical_all = (bool) $this->get('wpzaklad_critical_css_all_pages');
+            add_action('wp_head', function () use ($critical_css, $critical_all): void {
+                if (!$critical_all && !is_front_page()) return;
+                echo '<style id="wpzaklad-critical-css">' . $critical_css . '</style>' . "\n";
+            }, 1);
         }
 
         // Async CSS

@@ -470,6 +470,12 @@ return [
     'force_font_swap_desc'              => 'Forces <code>font-display:swap</code> on all @font-face declarations in &lt;head&gt;. Text appears immediately with a system font and swaps to the custom font once loaded.',
     'preload_fonts_label'               => 'Preload Fonts (URLs)',
     'preload_fonts_desc'                => 'Font file URLs to preload – one per line. Type is auto-detected (woff2, woff, ttf). E.g. <code>/wp-content/fonts/inter.woff2</code>.',
+    'critical_css_label'                => 'Critical CSS',
+    'critical_css_desc'                 => 'Inlines above-the-fold CSS directly into &lt;head&gt;. The browser renders the page instantly without waiting for external stylesheets. Works best combined with Async CSS.',
+    'critical_css_all_pages_label'      => 'Critical CSS on all pages',
+    'critical_css_all_pages_desc'       => 'By default, Critical CSS is applied only on the homepage. Enable if all pages share the same layout.',
+    'critical_css_code_label'           => 'Critical CSS code',
+    'critical_css_code_desc'            => 'CSS rules for above-the-fold content (header, hero section, navigation). Generate via DevTools → Coverage tab or an online tool (e.g. kriticalcss.com).',
 
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Maintenance Start',

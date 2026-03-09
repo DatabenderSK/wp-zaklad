@@ -135,6 +135,9 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             add_filter('show_admin_bar', '__return_false');
         }
 
+        // AJAX handler for auto-saving generated Critical CSS
+        add_action('wp_ajax_wpzaklad_save_critical_css', [$this, 'ajax_save_critical_css']);
+
         // --- PageSpeed optimizations ---
 
         // Font-display: swap (output buffer on wp_head)
@@ -425,48 +428,85 @@ window.parent.postMessage({type:'wpzaklad_critical_css',css:css.join('\n')},'*')
         <?php
     }
 
+    public function ajax_save_critical_css(): void {
+        check_ajax_referer('wpzaklad_critical_css');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized', 403);
+        }
+        $css = wp_unslash($_POST['css'] ?? '');
+        $settings = get_option('wpzaklad_settings', []);
+        $settings['wpzaklad_critical_css_code'] = $css;
+        update_option('wpzaklad_settings', $settings, false);
+        wp_send_json_success();
+    }
+
     public function render_custom_tab(): void {
         $home = esc_url(home_url('/?wpzaklad_critical_gen=1'));
-        $btn_text = esc_js(wpbl_t('critical_css_generate_btn'));
+        $nonce = wp_create_nonce('wpzaklad_critical_css');
         $generating = esc_js(wpbl_t('critical_css_generating'));
         $done = esc_js(wpbl_t('critical_css_done'));
+        $regen = esc_js(wpbl_t('critical_css_regenerate_btn'));
         $timeout_msg = esc_js(wpbl_t('critical_css_timeout'));
         ?>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
     var ta=document.getElementById('wpzaklad_critical_css_code');
-    if(!ta)return;
+    var cb=document.getElementById('wpzaklad_critical_css');
+    if(!ta||!cb)return;
     var wrap=ta.closest('.wpbl-setting-info')||ta.parentNode;
-    var btn=document.createElement('button');
-    btn.type='button';btn.className='button button-secondary';
-    btn.textContent='<?php echo $btn_text; ?>';
-    btn.style.marginBottom='8px';
-    var status=document.createElement('span');
-    status.style.cssText='margin-left:10px;font-style:italic;display:none';
+    var running=false;
+
+    // Status + re-generate button
     var row=document.createElement('div');
-    row.style.marginBottom='6px';
+    row.style.cssText='margin-bottom:6px;display:flex;align-items:center;gap:10px';
+    var btn=document.createElement('button');
+    btn.type='button';btn.className='button button-secondary button-small';
+    btn.textContent='<?php echo $regen; ?>';
+    btn.style.display=ta.value.trim()?'inline-block':'none';
+    var status=document.createElement('span');
+    status.style.cssText='font-style:italic;color:#666';
     row.appendChild(btn);row.appendChild(status);
     wrap.insertBefore(row,ta);
-    btn.addEventListener('click',function(){
+
+    function generate(){
+        if(running)return;running=true;
         btn.disabled=true;
-        status.style.display='inline';
         status.textContent='<?php echo $generating; ?>';
         var iframe=document.createElement('iframe');
         iframe.style.cssText='position:fixed;left:-9999px;width:1440px;height:900px;border:none;opacity:0';
         iframe.src='<?php echo $home; ?>';
         document.body.appendChild(iframe);
-        var timer=setTimeout(function(){done();status.textContent='<?php echo $timeout_msg; ?>'},30000);
-        function done(){if(iframe.parentNode)iframe.remove();clearTimeout(timer);btn.disabled=false}
+        var timer=setTimeout(function(){cleanup();status.textContent='<?php echo $timeout_msg; ?>'},30000);
+
+        function cleanup(){if(iframe.parentNode)iframe.remove();clearTimeout(timer);running=false;btn.disabled=false}
+
         window.addEventListener('message',function handler(e){
-            if(e.data&&e.data.type==='wpzaklad_critical_css'){
-                window.removeEventListener('message',handler);
-                done();
-                ta.value=e.data.css;
-                ta.dispatchEvent(new Event('change'));
-                status.textContent='<?php echo $done; ?>';
-            }
+            if(!e.data||e.data.type!=='wpzaklad_critical_css')return;
+            window.removeEventListener('message',handler);
+            cleanup();
+            ta.value=e.data.css;
+            btn.style.display='inline-block';
+            status.textContent='<?php echo $done; ?>';
+
+            // Auto-save via AJAX
+            var fd=new FormData();
+            fd.append('action','wpzaklad_save_critical_css');
+            fd.append('_ajax_nonce','<?php echo $nonce; ?>');
+            fd.append('css',e.data.css);
+            fetch(ajaxurl,{method:'POST',body:fd});
         });
+    }
+
+    // Auto-generate: checkbox is ON + textarea empty
+    if(cb.checked&&!ta.value.trim()){generate()}
+
+    // When checkbox is toggled ON and textarea is empty
+    cb.addEventListener('change',function(){
+        if(cb.checked&&!ta.value.trim()){generate()}
     });
+
+    // Manual re-generate
+    btn.addEventListener('click',function(){generate()});
 });
 </script>
         <?php

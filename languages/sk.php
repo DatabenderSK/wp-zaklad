@@ -475,11 +475,11 @@ return [
     'critical_css_all_pages_label'      => 'Critical CSS na všetkých stránkach',
     'critical_css_all_pages_desc'       => 'Predvolene sa Critical CSS aplikuje len na homepage. Zapni ak má rovnaký layout na všetkých stránkach.',
     'critical_css_code_label'           => 'Critical CSS kód',
-    'critical_css_code_desc'            => 'CSS pravidlá pre above-the-fold obsah (header, hero sekcia, navigácia). Klikni „Generovať" pre automatické vytvorenie.',
-    'critical_css_generate_btn'         => 'Generovať Critical CSS',
-    'critical_css_generating'           => 'Generujem… (načítavam homepage)',
-    'critical_css_done'                 => 'Hotovo! Nezabudni uložiť nastavenia.',
-    'critical_css_timeout'              => 'Timeout – skús to znova.',
+    'critical_css_code_desc'            => 'CSS pravidlá pre above-the-fold obsah. Generuje sa automaticky po zapnutí – môžeš aj manuálne upraviť.',
+    'critical_css_generating'           => 'Generujem Critical CSS…',
+    'critical_css_done'                 => 'Critical CSS vygenerovaný a uložený.',
+    'critical_css_timeout'              => 'Timeout – klikni Re-generovať.',
+    'critical_css_regenerate_btn'       => 'Re-generovať',
 
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Začiatok údržby',

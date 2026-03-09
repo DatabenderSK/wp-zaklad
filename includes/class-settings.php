@@ -100,7 +100,7 @@ class WPBL_Settings {
      */
     private function sanitize_import_value(string $key, mixed $value, mixed $default): mixed {
         // Fields that store arbitrary HTML / JavaScript (admin-only by design)
-        $raw_fields = ['wpzaklad_head_code', 'wpzaklad_footer_code'];
+        $raw_fields = ['wpzaklad_head_code', 'wpzaklad_footer_code', 'wpzaklad_critical_css_code'];
         if (in_array($key, $raw_fields, true)) {
             return wp_unslash((string) $value);
         }

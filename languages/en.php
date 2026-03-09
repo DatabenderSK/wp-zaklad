@@ -475,11 +475,11 @@ return [
     'critical_css_all_pages_label'      => 'Critical CSS on all pages',
     'critical_css_all_pages_desc'       => 'By default, Critical CSS is applied only on the homepage. Enable if all pages share the same layout.',
     'critical_css_code_label'           => 'Critical CSS code',
-    'critical_css_code_desc'            => 'CSS rules for above-the-fold content (header, hero section, navigation). Click "Generate" for automatic creation.',
-    'critical_css_generate_btn'         => 'Generate Critical CSS',
-    'critical_css_generating'           => 'Generating… (loading homepage)',
-    'critical_css_done'                 => 'Done! Remember to save settings.',
-    'critical_css_timeout'              => 'Timeout – try again.',
+    'critical_css_code_desc'            => 'CSS rules for above-the-fold content. Generated automatically when enabled – you can also edit manually.',
+    'critical_css_generating'           => 'Generating Critical CSS…',
+    'critical_css_done'                 => 'Critical CSS generated and saved.',
+    'critical_css_timeout'              => 'Timeout – click Re-generate.',
+    'critical_css_regenerate_btn'       => 'Re-generate',
 
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Maintenance Start',

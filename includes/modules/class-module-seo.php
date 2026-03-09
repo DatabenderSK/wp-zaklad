@@ -26,7 +26,7 @@ class WPBL_Module_Seo extends WPBL_Module_Base {
             ['key' => 'wpzaklad_redirect_attachments',    'type' => 'checkbox', 'label' => wpbl_t('redirect_attachments_label'), 'desc' => wpbl_t('redirect_attachments_desc'), 'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_open_graph',              'type' => 'checkbox', 'label' => wpbl_t('open_graph_label'),           'desc' => wpbl_t('open_graph_desc')],
             ['key' => 'wpzaklad_custom_robots_txt',       'type' => 'textarea', 'label' => wpbl_t('custom_robots_txt_label'),   'desc' => wpbl_t('custom_robots_txt_desc'),   'sanitize' => 'raw'],
-            ['key' => 'wpzaklad_disable_wp_sitemap',      'type' => 'checkbox', 'label' => wpbl_t('disable_wp_sitemap_label'), 'desc' => wpbl_t('disable_wp_sitemap_desc'), 'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_disable_wp_sitemap',      'type' => 'checkbox', 'label' => wpbl_t('disable_wp_sitemap_label'), 'desc' => wpbl_t('disable_wp_sitemap_desc'), 'mine' => true],
         ];
     }
 

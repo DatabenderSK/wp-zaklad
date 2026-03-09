@@ -43,7 +43,7 @@ class WPBL_Module_Appearance extends WPBL_Module_Base {
             ['key' => 'wpzaklad_color_pending',          'type' => 'color',    'label' => wpbl_t('color_pending_label'),      'default' => '#fff8e5'],
             ['key' => 'wpzaklad_color_private',          'type' => 'color',    'label' => wpbl_t('color_private_label'),      'default' => '#f0f0f0'],
             ['key' => 'wpzaklad_color_future',           'type' => 'color',    'label' => wpbl_t('color_future_label'),       'default' => '#e8f5e9'],
-            ['key' => 'wpzaklad_login_bg_color', 'type' => 'color', 'label' => wpbl_t('login_bg_color_label'), 'desc' => wpbl_t('login_bg_color_desc'), 'default' => '', 'mine' => true],
+            ['key' => 'wpzaklad_login_bg_color', 'type' => 'color', 'label' => wpbl_t('login_bg_color_label'), 'desc' => wpbl_t('login_bg_color_desc'), 'default' => ''],
         ];
     }
 

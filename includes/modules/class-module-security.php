@@ -34,7 +34,7 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             ['key' => 'wpzaklad_hide_login_errors',        'type' => 'checkbox', 'label' => wpbl_t('hide_login_errors_label'),         'desc' => wpbl_t('hide_login_errors_desc'),        'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_block_author_scan',        'type' => 'checkbox', 'label' => wpbl_t('block_author_scan_label'),         'desc' => wpbl_t('block_author_scan_desc'),        'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_login_honeypot',           'type' => 'checkbox', 'label' => wpbl_t('login_honeypot_label'),            'desc' => wpbl_t('login_honeypot_desc'),           'recommended' => true, 'mine' => true],
-            ['key' => 'wpzaklad_disable_app_passwords',    'type' => 'checkbox', 'label' => wpbl_t('disable_app_passwords_label'),     'desc' => wpbl_t('disable_app_passwords_desc'),    'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_disable_app_passwords',    'type' => 'checkbox', 'label' => wpbl_t('disable_app_passwords_label'),     'desc' => wpbl_t('disable_app_passwords_desc'),    'recommended' => true],
             ['key' => 'wpzaklad_disable_php_uploads',      'type' => 'checkbox', 'label' => wpbl_t('disable_php_uploads_label'),       'desc' => wpbl_t('disable_php_uploads_desc'),      'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_custom_login_slug',        'type' => 'text',     'label' => wpbl_t('custom_login_slug_label'),         'desc' => wpbl_t('custom_login_slug_desc')],
         ];

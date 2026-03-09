@@ -453,37 +453,6 @@ class WPBL_Admin_UI {
                         <li><a href="#tab-tools"><?php echo esc_html(wpbl_t('tab_tools')); ?></a></li>
                     </ul>
 
-                    <!-- Preset quick-setup -->
-                    <div class="wpbl-preset-bar">
-                        <p class="wpbl-preset-label"><?php echo esc_html(wpbl_t('preset_label')); ?></p>
-                        <select id="wpbl-preset-select">
-                            <option value="">— <?php echo esc_html(wpbl_t('preset_choose')); ?> —</option>
-                            <option value="none"><?php echo esc_html(wpbl_t('preset_none')); ?></option>
-                            <option value="recommended"><?php echo esc_html(wpbl_t('preset_recommended')); ?></option>
-                            <option value="mine"><?php echo esc_html(wpbl_t('preset_mine')); ?></option>
-                        </select>
-                        <button type="button" id="wpbl-preset-apply" class="button button-small"><?php echo esc_html(wpbl_t('preset_apply_btn')); ?></button>
-                    </div>
-
-                    <script>
-                    (function($) {
-                        $('#wpbl-preset-apply').on('click', function() {
-                            var preset = $('#wpbl-preset-select').val();
-                            if (!preset) return;
-
-                            var toEnable = [];
-                            if (preset === 'recommended') toEnable = wpbl.recommended || [];
-                            else if (preset === 'mine')    toEnable = wpbl.mine || [];
-                            // 'none' → toEnable stays []
-
-                            $('#wpbl-settings-form').find('input[type="checkbox"]').each(function() {
-                                this.checked = toEnable.indexOf(this.name) !== -1;
-                            });
-
-                            alert(wpbl.presetApplied || 'Applied.');
-                        });
-                    })(jQuery);
-                    </script>
                 </div>
 
                 <!-- Content -->
@@ -692,6 +661,40 @@ class WPBL_Admin_UI {
 
     private function render_tools_tab(): void {
         ?>
+        <!-- Presets -->
+        <div class="wpbl-tools-section">
+            <h3><?php echo esc_html(wpbl_t('preset_label')); ?></h3>
+            <p><?php echo esc_html(wpbl_t('preset_desc')); ?></p>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <select id="wpbl-preset-select">
+                    <option value="">— <?php echo esc_html(wpbl_t('preset_choose')); ?> —</option>
+                    <option value="none"><?php echo esc_html(wpbl_t('preset_none')); ?></option>
+                    <option value="recommended"><?php echo esc_html(wpbl_t('preset_recommended')); ?></option>
+                    <option value="mine"><?php echo esc_html(wpbl_t('preset_mine')); ?></option>
+                </select>
+                <button type="button" id="wpbl-preset-apply" class="button"><?php echo esc_html(wpbl_t('preset_apply_btn')); ?></button>
+            </div>
+        </div>
+
+        <script>
+        (function($) {
+            $('#wpbl-preset-apply').on('click', function() {
+                var preset = $('#wpbl-preset-select').val();
+                if (!preset) return;
+
+                var toEnable = [];
+                if (preset === 'recommended') toEnable = wpbl.recommended || [];
+                else if (preset === 'mine')    toEnable = wpbl.mine || [];
+
+                $('#wpbl-settings-form').find('input[type="checkbox"]').each(function() {
+                    this.checked = toEnable.indexOf(this.name) !== -1;
+                });
+
+                alert(wpbl.presetApplied || 'Applied.');
+            });
+        })(jQuery);
+        </script>
+
         <!-- Export -->
         <div class="wpbl-tools-section">
             <h3><?php echo esc_html(wpbl_t('tools_export_title')); ?></h3>

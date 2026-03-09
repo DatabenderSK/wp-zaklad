@@ -14,6 +14,8 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             'wpzaklad_revisions_limit'          => 10,
             'wpzaklad_disable_dashicons'        => 0,
             'wpzaklad_disable_font_library'     => 0,
+            'wpzaklad_hero_eager_load'          => 0,
+            'wpzaklad_hero_eager_class'         => '',
         ];
     }
 
@@ -53,7 +55,9 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
                 'min'  => -1,
             ],
             ['key' => 'wpzaklad_disable_dashicons',    'type' => 'checkbox', 'label' => wpbl_t('disable_dashicons_label'),    'desc' => wpbl_t('disable_dashicons_desc'),    'recommended' => true, 'mine' => true],
-            ['key' => 'wpzaklad_disable_font_library', 'type' => 'checkbox', 'label' => wpbl_t('disable_font_library_label'), 'desc' => wpbl_t('disable_font_library_desc'), 'recommended' => true, 'new' => true],
+            ['key' => 'wpzaklad_disable_font_library', 'type' => 'checkbox', 'label' => wpbl_t('disable_font_library_label'), 'desc' => wpbl_t('disable_font_library_desc'), 'recommended' => true],
+            ['key' => 'wpzaklad_hero_eager_load',    'type' => 'checkbox', 'label' => wpbl_t('hero_eager_load_label'),    'desc' => wpbl_t('hero_eager_load_desc'),    'recommended' => true, 'mine' => true, 'new' => true],
+            ['key' => 'wpzaklad_hero_eager_class',   'type' => 'text',     'label' => wpbl_t('hero_eager_class_label'),   'desc' => wpbl_t('hero_eager_class_desc')],
         ];
     }
 
@@ -93,6 +97,32 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
         if ($this->get('wpzaklad_disable_font_library')) {
             add_filter('block_editor_settings_all', [$this, 'disable_font_library_editor']);
             add_filter('rest_endpoints', [$this, 'remove_font_library_endpoints']);
+        }
+
+        $hero_class = trim((string) $this->get('wpzaklad_hero_eager_class'));
+        if ($this->get('wpzaklad_hero_eager_load') && $hero_class !== '') {
+            add_filter('wp_content_img_tag', function (string $image) use ($hero_class): string {
+                if (!is_front_page()) return $image;
+
+                // Check if any of the configured classes matches
+                $classes = array_filter(array_map('trim', preg_split('/[\s,]+/', $hero_class)));
+                $matched = false;
+                foreach ($classes as $cls) {
+                    if ($cls !== '' && str_contains($image, $cls)) {
+                        $matched = true;
+                        break;
+                    }
+                }
+                if (!$matched) return $image;
+
+                // Set eager loading + high fetch priority
+                $image = str_replace('loading="lazy"', 'loading="eager"', $image);
+                if (!str_contains($image, 'fetchpriority')) {
+                    $image = str_replace('<img ', '<img fetchpriority="high" ', $image);
+                }
+
+                return $image;
+            });
         }
     }
 

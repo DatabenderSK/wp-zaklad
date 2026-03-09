@@ -304,6 +304,8 @@ return [
     'login_lockout_minutes_label'    => 'Lockout Duration (minutes)',
     'login_lockout_minutes_desc'     => 'How many minutes the IP address will be blocked after exceeding the attempt limit. Default: 15.',
     'login_locked_out'               => '<strong>Too many failed attempts.</strong> Please try again in %d minutes.',
+    'login_rate_whitelist_label'     => 'IP Addresses Excluded from Blocking',
+    'login_rate_whitelist_desc'      => 'IP addresses that will never be blocked (your IP, client IP). One per line or separated by commas. Find your current IP at <a href="https://icanhazip.com" target="_blank">icanhazip.com</a>.',
 
     // Security – custom login URL
     'login_honeypot_label'           => 'Login Honeypot',
@@ -439,6 +441,12 @@ return [
     // Performance – new v1.4
     'disable_font_library_label'        => 'Disable Font Library',
     'disable_font_library_desc'         => 'Removes the Font Library panel from the block editor and blocks font-related REST API endpoints. Unnecessary if fonts are managed by your theme.',
+
+    // Performance – hero eager load
+    'hero_eager_load_label'             => 'Eager Load for Hero Image',
+    'hero_eager_load_desc'              => 'Disables lazy-load on the hero image on the homepage and adds <code>fetchpriority="high"</code>. Improves LCP (Largest Contentful Paint) score.',
+    'hero_eager_class_label'            => 'Hero Image CSS Class',
+    'hero_eager_class_desc'             => 'CSS class or partial class name of the image to apply eager loading to. Separate multiple classes with a comma (e.g. <code>gb-media-dab136ad, hero-image</code>).',
 
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Maintenance Start',

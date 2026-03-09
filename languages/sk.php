@@ -304,6 +304,8 @@ return [
     'login_lockout_minutes_label'    => 'Doba zablokovania (minúty)',
     'login_lockout_minutes_desc'     => 'Na koľko minút bude IP adresa zablokovaná po prekročení limitu pokusov. Predvolené: 15.',
     'login_locked_out'               => '<strong>Príliš veľa neúspešných pokusov.</strong> Skúste to znova o %d minút.',
+    'login_rate_whitelist_label'     => 'IP adresy vyňaté z blokovania',
+    'login_rate_whitelist_desc'      => 'IP adresy, ktoré nikdy nebudú zablokované (tvoja IP, IP klienta). Jedna adresa na riadok alebo oddelené čiarkou. Tvoju aktuálnu IP nájdeš na <a href="https://icanhazip.com" target="_blank">icanhazip.com</a>.',
 
     // Security – custom login URL
     'login_honeypot_label'           => 'Login honeypot',
@@ -439,6 +441,12 @@ return [
     // Performance – new v1.4
     'disable_font_library_label'        => 'Vypnúť Knižnicu fontov',
     'disable_font_library_desc'         => 'Odstráni panel Knižnica fontov z editora blokov a zablokuje REST API endpointy pre fonty. Zbytočné ak fonty spravujete cez tému.',
+
+    // Performance – hero eager load
+    'hero_eager_load_label'             => 'Eager load pre hero obrázok',
+    'hero_eager_load_desc'              => 'Vypne lazy-load na hero obrázku na homepage a pridá <code>fetchpriority="high"</code>. Zlepšuje LCP (Largest Contentful Paint) skóre.',
+    'hero_eager_class_label'            => 'CSS trieda hero obrázka',
+    'hero_eager_class_desc'             => 'CSS trieda alebo časť class name obrázka, na ktorý sa má aplikovať eager loading. Viac tried oddeľ čiarkou (napr. <code>gb-media-dab136ad, hero-image</code>).',
 
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Začiatok údržby',

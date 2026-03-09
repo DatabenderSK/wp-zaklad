@@ -24,6 +24,7 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             'wpzaklad_login_rate_limit'          => 0,
             'wpzaklad_login_max_attempts'        => 5,
             'wpzaklad_login_lockout_minutes'     => 15,
+            'wpzaklad_login_rate_whitelist'       => '',
         ];
     }
 
@@ -45,6 +46,7 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             ['key' => 'wpzaklad_login_rate_limit',        'type' => 'checkbox', 'label' => wpbl_t('login_rate_limit_label'),        'desc' => wpbl_t('login_rate_limit_desc'),        'recommended' => true, 'mine' => true, 'new' => true],
             ['key' => 'wpzaklad_login_max_attempts',      'type' => 'number',   'label' => wpbl_t('login_max_attempts_label'),      'desc' => wpbl_t('login_max_attempts_desc'),      'min' => 1],
             ['key' => 'wpzaklad_login_lockout_minutes',   'type' => 'number',   'label' => wpbl_t('login_lockout_minutes_label'),   'desc' => wpbl_t('login_lockout_minutes_desc'),   'min' => 1],
+            ['key' => 'wpzaklad_login_rate_whitelist',    'type' => 'textarea', 'label' => wpbl_t('login_rate_whitelist_label'),    'desc' => wpbl_t('login_rate_whitelist_desc')],
         ];
     }
 
@@ -201,10 +203,13 @@ class WPBL_Module_Security extends WPBL_Module_Base {
     // -------------------------------------------------------------------------
 
     public function check_login_lockout($user) {
-        $ip       = $this->get_client_ip();
-        $lock_key = 'wpbl_login_lock_' . md5($ip);
+        $ip = $this->get_client_ip();
 
-        if (get_transient($lock_key)) {
+        if ($this->is_ip_whitelisted($ip)) {
+            return $user;
+        }
+
+        if (get_transient('wpbl_login_lock_' . md5($ip))) {
             $minutes = (int) $this->get('wpzaklad_login_lockout_minutes') ?: 15;
             return new \WP_Error(
                 'wpbl_locked_out',
@@ -216,7 +221,12 @@ class WPBL_Module_Security extends WPBL_Module_Base {
     }
 
     public function track_failed_login(string $username): void {
-        $ip       = $this->get_client_ip();
+        $ip = $this->get_client_ip();
+
+        if ($this->is_ip_whitelisted($ip)) {
+            return;
+        }
+
         $fail_key = 'wpbl_login_fails_' . md5($ip);
         $count    = (int) get_transient($fail_key) + 1;
         $max      = (int) $this->get('wpzaklad_login_max_attempts') ?: 5;
@@ -244,6 +254,14 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             }
         }
         return '0.0.0.0';
+    }
+
+    private function is_ip_whitelisted(string $ip): bool {
+        $raw = (string) $this->get('wpzaklad_login_rate_whitelist');
+        if ($raw === '') return false;
+
+        $list = array_filter(array_map('trim', preg_split('/[\s,]+/', $raw)));
+        return in_array($ip, $list, true);
     }
 
     // -------------------------------------------------------------------------

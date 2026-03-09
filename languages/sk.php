@@ -221,8 +221,9 @@ return [
     'preset_applied'            => 'Predvolenie aplikované. Nezabudni uložiť nastavenia.',
 
     // Admin Menu Manager
-    'admin_menu_order_title'    => 'Poradie bočného menu',
-    'admin_menu_order_desc'     => 'Presuň položky myšou pre zmenu poradia. Po uložení sa poradie aplikuje na admin panel.',
+    'admin_menu_order_title'    => 'Poradie a viditeľnosť bočného menu',
+    'admin_menu_order_desc'     => 'Presuň položky myšou pre zmenu poradia. Klikni na ikonu oka pre skrytie položky pred ne-administrátormi. Po uložení sa zmeny aplikujú na admin panel.',
+    'admin_menu_toggle_visibility' => 'Skryť / zobraziť položku',
     'admin_menu_toolbar_title'  => 'Rýchle odkazy (admin lišta)',
     'admin_menu_toolbar_desc'   => 'Zadaj URL, plugin ju automaticky skráti na relatívnu cestu. Odkazy sa zobrazia pod blesk ikonou v admin lište.',
     'admin_menu_toolbar_name'   => 'Názov',

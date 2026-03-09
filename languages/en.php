@@ -221,8 +221,9 @@ return [
     'preset_applied'            => 'Preset applied. Remember to save settings.',
 
     // Admin Menu Manager
-    'admin_menu_order_title'    => 'Sidebar Menu Order',
-    'admin_menu_order_desc'     => 'Drag and drop items to reorder. Save to apply the new order to your admin panel.',
+    'admin_menu_order_title'    => 'Sidebar Menu Order & Visibility',
+    'admin_menu_order_desc'     => 'Drag and drop items to reorder. Click the eye icon to hide an item from non-administrators. Save to apply changes.',
+    'admin_menu_toggle_visibility' => 'Toggle visibility',
     'admin_menu_toolbar_title'  => 'Quick Links (Admin Bar)',
     'admin_menu_toolbar_desc'   => 'Enter a URL and the plugin will automatically strip it to a relative path. Links appear under the lightning bolt icon in the admin bar.',
     'admin_menu_toolbar_name'   => 'Name',

@@ -493,6 +493,42 @@
     flex-shrink: 0;
 }
 
+.wpbl-menu-label {
+    flex: 1;
+    min-width: 0;
+}
+
+.wpbl-menu-visibility {
+    background: none;
+    border: none;
+    padding: 0 2px;
+    cursor: pointer;
+    color: #a7aaad;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color .15s;
+}
+
+.wpbl-menu-visibility:hover {
+    color: #2271b1;
+}
+
+.wpbl-menu-hidden {
+    opacity: .45;
+}
+
+.wpbl-menu-hidden .wpbl-menu-label {
+    text-decoration: line-through;
+}
+
+.wpbl-menu-hidden .wpbl-menu-visibility {
+    color: #d63638;
+}
+
+.wpbl-menu-hidden .wpbl-menu-visibility:hover {
+    color: #b01c1e;
+}
+
 .wpbl-menu-separator {
     list-style: none;
     padding: 4px 12px;

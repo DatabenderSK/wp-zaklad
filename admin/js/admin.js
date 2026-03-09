@@ -219,8 +219,23 @@
             },
         });
 
-        // Set initial hidden value
+        // Visibility toggle
+        $list.on('click', '.wpbl-menu-visibility', function (e) {
+            e.preventDefault();
+            var $card = $(this).closest('.wpbl-menu-card');
+            var $icon = $(this).find('.dashicons');
+            $card.toggleClass('wpbl-menu-hidden');
+            if ($card.hasClass('wpbl-menu-hidden')) {
+                $icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
+            } else {
+                $icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
+            }
+            syncMenuHidden($list);
+        });
+
+        // Set initial hidden values
         syncMenuOrder($list);
+        syncMenuHidden($list);
     }
 
     function syncMenuOrder($list) {
@@ -228,6 +243,13 @@
             return $(this).data('slug');
         }).get().join(',');
         $('#wpzaklad_menu_order_string').val(order);
+    }
+
+    function syncMenuHidden($list) {
+        var hidden = $list.find('.wpbl-menu-hidden').map(function () {
+            return $(this).data('slug');
+        }).get().join(',');
+        $('#wpzaklad_menu_hidden_string').val(hidden);
     }
 
     // -------------------------------------------------------------------------

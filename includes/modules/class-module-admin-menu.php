@@ -18,6 +18,11 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
         if (current_user_can('manage_options')) {
             add_action('admin_bar_menu', [$this, 'apply_toolbar'], 999);
         }
+
+        // Hide menu items for non-admins
+        if (!current_user_can('manage_options')) {
+            add_action('admin_menu', [$this, 'apply_hidden_items'], 9999);
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -27,8 +32,9 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
     public function render_custom_tab(): void {
         global $menu;
 
-        $saved_order = get_option('wpzaklad_admin_menu_order', []);
-        $toolbar     = get_option('wpzaklad_admin_menu_toolbar', []);
+        $saved_order  = get_option('wpzaklad_admin_menu_order', []);
+        $hidden_items = get_option('wpzaklad_admin_menu_hidden', []);
+        $toolbar      = get_option('wpzaklad_admin_menu_toolbar', []);
 
         // Build ordered menu items list
         $menu_items = [];
@@ -55,23 +61,31 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
             $menu_items = $sorted;
         }
 
-        $order_value = implode(',', array_keys($menu_items));
+        $order_value  = implode(',', array_keys($menu_items));
+        $hidden_value = implode(',', $hidden_items);
         ?>
 
-        <!-- Menu order -->
+        <!-- Menu order & visibility -->
         <div class="wpbl-setting wpbl-admin-menu-section">
             <div class="wpbl-setting-info">
                 <strong class="wpbl-setting-label"><?php echo esc_html(wpbl_t('admin_menu_order_title')); ?></strong>
-                <span class="wpbl-setting-desc"><?php echo esc_html(wpbl_t('admin_menu_order_desc')); ?></span>
+                <span class="wpbl-setting-desc"><?php echo wp_kses_post(wpbl_t('admin_menu_order_desc')); ?></span>
                 <input type="hidden" id="wpzaklad_menu_order_string" name="wpzaklad_menu_order_string" value="<?php echo esc_attr($order_value); ?>">
+                <input type="hidden" id="wpzaklad_menu_hidden_string" name="wpzaklad_menu_hidden_string" value="<?php echo esc_attr($hidden_value); ?>">
                 <ul id="wpbl-menu-sortable">
                     <?php foreach ($menu_items as $slug => $label): ?>
-                        <?php $is_sep = ($label === '' || str_starts_with($slug, 'separator')); ?>
-                        <li class="<?php echo $is_sep ? 'wpbl-menu-separator' : 'wpbl-menu-card'; ?>"
+                        <?php
+                        $is_sep   = ($label === '' || str_starts_with($slug, 'separator'));
+                        $is_hidden = in_array($slug, $hidden_items, true);
+                        ?>
+                        <li class="<?php echo $is_sep ? 'wpbl-menu-separator' : 'wpbl-menu-card'; ?><?php echo $is_hidden ? ' wpbl-menu-hidden' : ''; ?>"
                             data-slug="<?php echo esc_attr($slug); ?>">
                             <?php if (!$is_sep): ?>
                                 <span class="wpbl-menu-handle dashicons dashicons-menu-alt2"></span>
-                                <?php echo esc_html($label ?: $slug); ?>
+                                <span class="wpbl-menu-label"><?php echo esc_html($label ?: $slug); ?></span>
+                                <button type="button" class="wpbl-menu-visibility" title="<?php echo esc_attr(wpbl_t('admin_menu_toggle_visibility')); ?>">
+                                    <span class="dashicons <?php echo $is_hidden ? 'dashicons-hidden' : 'dashicons-visibility'; ?>"></span>
+                                </button>
                             <?php else: ?>
                                 <span class="wpbl-sep-line"></span>
                             <?php endif; ?>
@@ -315,6 +329,13 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
             update_option('wpzaklad_admin_menu_order', $order);
         }
 
+        // Hidden menu items
+        if (isset($post['wpzaklad_menu_hidden_string'])) {
+            $raw    = sanitize_text_field(wp_unslash($post['wpzaklad_menu_hidden_string']));
+            $hidden = $raw !== '' ? array_values(array_filter(array_map('trim', explode(',', $raw)))) : [];
+            update_option('wpzaklad_admin_menu_hidden', $hidden);
+        }
+
         // Toolbar links
         if (isset($post['wpzaklad_toolbar']) && is_array($post['wpzaklad_toolbar'])) {
             $clean = [];
@@ -342,6 +363,19 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
 
         $remaining = array_values(array_diff($menu_order, $saved));
         return array_merge($saved, $remaining);
+    }
+
+    // -------------------------------------------------------------------------
+    // Apply hidden menu items (non-admins only)
+    // -------------------------------------------------------------------------
+
+    public function apply_hidden_items(): void {
+        $hidden = get_option('wpzaklad_admin_menu_hidden', []);
+        if (empty($hidden)) return;
+
+        foreach ($hidden as $slug) {
+            remove_menu_page($slug);
+        }
     }
 
     // -------------------------------------------------------------------------

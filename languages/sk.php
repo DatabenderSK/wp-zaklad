@@ -475,7 +475,11 @@ return [
     'critical_css_all_pages_label'      => 'Critical CSS na všetkých stránkach',
     'critical_css_all_pages_desc'       => 'Predvolene sa Critical CSS aplikuje len na homepage. Zapni ak má rovnaký layout na všetkých stránkach.',
     'critical_css_code_label'           => 'Critical CSS kód',
-    'critical_css_code_desc'            => 'CSS pravidlá pre above-the-fold obsah (header, hero sekcia, navigácia). Vygeneruj cez DevTools → Coverage tab alebo online nástroj (napr. kriticalcss.com).',
+    'critical_css_code_desc'            => 'CSS pravidlá pre above-the-fold obsah (header, hero sekcia, navigácia). Klikni „Generovať" pre automatické vytvorenie.',
+    'critical_css_generate_btn'         => 'Generovať Critical CSS',
+    'critical_css_generating'           => 'Generujem… (načítavam homepage)',
+    'critical_css_done'                 => 'Hotovo! Nezabudni uložiť nastavenia.',
+    'critical_css_timeout'              => 'Timeout – skús to znova.',
 
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Začiatok údržby',

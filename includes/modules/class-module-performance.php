@@ -129,6 +129,12 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             add_filter('rest_endpoints', [$this, 'remove_font_library_endpoints']);
         }
 
+        // Critical CSS generator (frontend script injection for iframe)
+        if (!is_admin() && isset($_GET['wpzaklad_critical_gen'])) {
+            add_action('wp_footer', [$this, 'render_critical_css_generator'], 9999);
+            add_filter('show_admin_bar', '__return_false');
+        }
+
         // --- PageSpeed optimizations ---
 
         // Font-display: swap (output buffer on wp_head)
@@ -369,5 +375,100 @@ setTimeout(r,<?php echo $timeout; ?>);
         $tag = str_replace('rel="stylesheet"', 'rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'"', $tag);
 
         return $tag . "\n" . $noscript;
+    }
+
+    // --- Critical CSS generator ---
+
+    public function render_critical_css_generator(): void {
+        if (!current_user_can('manage_options')) return;
+        ?>
+<script>
+window.addEventListener('load',function(){setTimeout(function(){
+var vh=window.innerHeight,css=[],kf={},usedKf=[];
+function aboveFold(sel){
+    var s=sel.replace(/::[\w-]+(\([^)]*\))?/g,'').replace(/:(?:hover|focus|active|visited|focus-within|focus-visible)\b/g,'').trim();
+    if(!s||/^(\*|:root|html|body)(\s|,|$|:|\[|{)/.test(s))return true;
+    try{var e=document.querySelectorAll(s);for(var i=0;i<e.length;i++){
+        var r=e[i].getBoundingClientRect();
+        if(r.top<vh&&(r.height>0||r.width>0))return true;
+    }}catch(x){return true}
+    return false;
+}
+function proc(rules){
+    var out=[];
+    for(var i=0;i<rules.length;i++){var r=rules[i];
+        if(r instanceof CSSFontFaceRule){out.push(r.cssText)}
+        else if(r instanceof CSSKeyframesRule){kf[r.name]=r.cssText}
+        else if(r instanceof CSSMediaRule){
+            var sub=proc(r.cssRules);
+            if(sub.length)out.push('@media '+r.conditionText+'{'+sub.join('')+'}');
+        }
+        else if(r instanceof CSSStyleRule){
+            var sels=r.selectorText.split(','),match=false;
+            for(var j=0;j<sels.length;j++){if(aboveFold(sels[j])){match=true;break}}
+            if(match){
+                out.push(r.cssText);
+                var an=r.style.animationName;
+                if(an&&an!=='none')an.split(',').forEach(function(a){a=a.trim();if(a)usedKf.push(a)});
+            }
+        }
+    }
+    return out;
+}
+for(var s=0;s<document.styleSheets.length;s++){
+    try{var rules=document.styleSheets[s].cssRules;if(rules)css=css.concat(proc(rules))}catch(e){}
+}
+usedKf.forEach(function(n){if(kf[n])css.unshift(kf[n])});
+window.parent.postMessage({type:'wpzaklad_critical_css',css:css.join('\n')},'*');
+},500)});
+</script>
+        <?php
+    }
+
+    public function render_custom_tab(): void {
+        $home = esc_url(home_url('/?wpzaklad_critical_gen=1'));
+        $btn_text = esc_js(wpbl_t('critical_css_generate_btn'));
+        $generating = esc_js(wpbl_t('critical_css_generating'));
+        $done = esc_js(wpbl_t('critical_css_done'));
+        $timeout_msg = esc_js(wpbl_t('critical_css_timeout'));
+        ?>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+    var ta=document.getElementById('wpzaklad_critical_css_code');
+    if(!ta)return;
+    var wrap=ta.closest('.wpbl-setting-info')||ta.parentNode;
+    var btn=document.createElement('button');
+    btn.type='button';btn.className='button button-secondary';
+    btn.textContent='<?php echo $btn_text; ?>';
+    btn.style.marginBottom='8px';
+    var status=document.createElement('span');
+    status.style.cssText='margin-left:10px;font-style:italic;display:none';
+    var row=document.createElement('div');
+    row.style.marginBottom='6px';
+    row.appendChild(btn);row.appendChild(status);
+    wrap.insertBefore(row,ta);
+    btn.addEventListener('click',function(){
+        btn.disabled=true;
+        status.style.display='inline';
+        status.textContent='<?php echo $generating; ?>';
+        var iframe=document.createElement('iframe');
+        iframe.style.cssText='position:fixed;left:-9999px;width:1440px;height:900px;border:none;opacity:0';
+        iframe.src='<?php echo $home; ?>';
+        document.body.appendChild(iframe);
+        var timer=setTimeout(function(){done();status.textContent='<?php echo $timeout_msg; ?>'},30000);
+        function done(){if(iframe.parentNode)iframe.remove();clearTimeout(timer);btn.disabled=false}
+        window.addEventListener('message',function handler(e){
+            if(e.data&&e.data.type==='wpzaklad_critical_css'){
+                window.removeEventListener('message',handler);
+                done();
+                ta.value=e.data.css;
+                ta.dispatchEvent(new Event('change'));
+                status.textContent='<?php echo $done; ?>';
+            }
+        });
+    });
+});
+</script>
+        <?php
     }
 }

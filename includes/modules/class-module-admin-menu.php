@@ -19,10 +19,8 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
             add_action('admin_bar_menu', [$this, 'apply_toolbar'], 999);
         }
 
-        // Hide menu items for non-admins
-        if (!current_user_can('manage_options')) {
-            add_action('admin_menu', [$this, 'apply_hidden_items'], 9999);
-        }
+        // Hide menu items for all users
+        add_action('admin_menu', [$this, 'apply_hidden_items'], 9999);
     }
 
     // -------------------------------------------------------------------------
@@ -373,7 +371,11 @@ class WPBL_Module_Admin_Menu extends WPBL_Module_Base {
         $hidden = get_option('wpzaklad_admin_menu_hidden', []);
         if (empty($hidden)) return;
 
+        // Never hide Settings (WP Základ lives there)
+        $protected = ['options-general.php'];
+
         foreach ($hidden as $slug) {
+            if (in_array($slug, $protected, true)) continue;
             remove_menu_page($slug);
         }
     }

@@ -25,7 +25,7 @@ class WPBL_Module_Scripts extends WPBL_Module_Base {
             'wpzaklad_linkedin_partner_id'    => '',
             'wpzaklad_x_pixel_id'             => '',
             'wpzaklad_pinterest_tag_id'       => '',
-            'wpzaklad_pixels_exclude_admins'  => 0,
+            'wpzaklad_pixels_exclude_admins'  => 1,
             // Custom code
             'wpzaklad_head_code'              => '',
             'wpzaklad_footer_code'            => '',
@@ -385,31 +385,31 @@ class WPBL_Module_Scripts extends WPBL_Module_Base {
                 <div style="margin-top:12px;display:flex;flex-direction:column;gap:14px;">
                     <div>
                         <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('fb_pixel_id_label')); ?></label>
-                        <input type="text" name="wpzaklad_fb_pixel_id" value="<?php echo esc_attr($fb_pixel); ?>" class="regular-text" placeholder="123456789012345">
+                        <input type="text" name="wpzaklad_fb_pixel_id" value="<?php echo esc_attr($fb_pixel); ?>" class="regular-text">
                     </div>
                     <div>
                         <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('clarity_id_label')); ?></label>
-                        <input type="text" name="wpzaklad_clarity_id" value="<?php echo esc_attr($clarity); ?>" class="regular-text" placeholder="abc1def2gh">
+                        <input type="text" name="wpzaklad_clarity_id" value="<?php echo esc_attr($clarity); ?>" class="regular-text">
                     </div>
                     <div>
                         <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('tiktok_pixel_id_label')); ?></label>
-                        <input type="text" name="wpzaklad_tiktok_pixel_id" value="<?php echo esc_attr($tiktok); ?>" class="regular-text" placeholder="ABCDEF123456">
+                        <input type="text" name="wpzaklad_tiktok_pixel_id" value="<?php echo esc_attr($tiktok); ?>" class="regular-text">
                     </div>
                     <div>
                         <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('bing_uet_id_label')); ?></label>
-                        <input type="text" name="wpzaklad_bing_uet_id" value="<?php echo esc_attr($bing_uet); ?>" class="regular-text" placeholder="5637647">
+                        <input type="text" name="wpzaklad_bing_uet_id" value="<?php echo esc_attr($bing_uet); ?>" class="regular-text">
                     </div>
                     <div>
                         <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('linkedin_partner_id_label')); ?></label>
-                        <input type="text" name="wpzaklad_linkedin_partner_id" value="<?php echo esc_attr($linkedin); ?>" class="regular-text" placeholder="123456">
+                        <input type="text" name="wpzaklad_linkedin_partner_id" value="<?php echo esc_attr($linkedin); ?>" class="regular-text">
                     </div>
                     <div>
                         <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('x_pixel_id_label')); ?></label>
-                        <input type="text" name="wpzaklad_x_pixel_id" value="<?php echo esc_attr($x_pixel); ?>" class="regular-text" placeholder="obw0r">
+                        <input type="text" name="wpzaklad_x_pixel_id" value="<?php echo esc_attr($x_pixel); ?>" class="regular-text">
                     </div>
                     <div>
                         <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('pinterest_tag_id_label')); ?></label>
-                        <input type="text" name="wpzaklad_pinterest_tag_id" value="<?php echo esc_attr($pinterest); ?>" class="regular-text" placeholder="2612741693333">
+                        <input type="text" name="wpzaklad_pinterest_tag_id" value="<?php echo esc_attr($pinterest); ?>" class="regular-text">
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <input type="checkbox" id="wpzaklad_pixels_exclude_admins" name="wpzaklad_pixels_exclude_admins" value="1" <?php checked($px_excl); ?>>

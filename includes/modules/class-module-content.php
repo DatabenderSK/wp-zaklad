@@ -40,7 +40,7 @@ class WPBL_Module_Content extends WPBL_Module_Base {
             ['key' => 'wpzaklad_duplicate_posts',        'type' => 'checkbox', 'label' => wpbl_t('duplicate_posts_label'),           'desc' => wpbl_t('duplicate_posts_desc'),           'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_featured_image_column',  'type' => 'checkbox', 'label' => wpbl_t('featured_image_column_label'),    'desc' => wpbl_t('featured_image_column_desc'),    'mine' => true, 'new' => true],
             ['key' => 'wpzaklad_media_filesize_column',  'type' => 'checkbox', 'label' => wpbl_t('media_filesize_column_label'),    'desc' => wpbl_t('media_filesize_column_desc'),    'mine' => true, 'new' => true],
-            ['key' => 'wpzaklad_external_links_blank',   'type' => 'checkbox', 'label' => wpbl_t('external_links_blank_label'),     'desc' => wpbl_t('external_links_blank_desc'),     'mine' => true, 'new' => true],
+            ['key' => 'wpzaklad_external_links_blank',   'type' => 'checkbox', 'label' => wpbl_t('external_links_blank_label'),     'desc' => wpbl_t('external_links_blank_desc'),     'new' => true],
         ];
     }
 

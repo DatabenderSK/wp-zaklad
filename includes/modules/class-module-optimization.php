@@ -33,7 +33,7 @@ class WPBL_Module_Optimization extends WPBL_Module_Base {
             ['key' => 'wpzaklad_disable_self_pingbacks', 'type' => 'checkbox', 'label' => wpbl_t('disable_self_pingbacks_label'), 'desc' => wpbl_t('disable_self_pingbacks_desc'), 'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_clean_head',             'type' => 'checkbox', 'label' => wpbl_t('clean_head_label'),             'desc' => wpbl_t('clean_head_desc'),             'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_block_update_emails',    'type' => 'checkbox', 'label' => wpbl_t('block_update_emails_label'),    'desc' => wpbl_t('block_update_emails_desc'),    'recommended' => true, 'mine' => true],
-            ['key' => 'wpzaklad_lazy_load_iframes',      'type' => 'checkbox', 'label' => wpbl_t('lazy_load_iframes_label'),      'desc' => wpbl_t('lazy_load_iframes_desc')],
+            ['key' => 'wpzaklad_lazy_load_iframes',      'type' => 'checkbox', 'label' => wpbl_t('lazy_load_iframes_label'),      'desc' => wpbl_t('lazy_load_iframes_desc'), 'mine' => true],
             ['key' => 'wpzaklad_disable_gravatars',      'type' => 'checkbox', 'label' => wpbl_t('disable_gravatars_label'),      'desc' => wpbl_t('disable_gravatars_desc'), 'mine' => true],
             ['key' => 'wpzaklad_local_avatars',          'type' => 'checkbox', 'label' => wpbl_t('local_avatars_label'),          'desc' => wpbl_t('local_avatars_desc'), 'mine' => true],
             ['key' => 'wpzaklad_disable_admin_emails', 'type' => 'checkbox', 'label' => wpbl_t('disable_admin_emails_label'), 'desc' => wpbl_t('disable_admin_emails_desc'), 'mine' => true],

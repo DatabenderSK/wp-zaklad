@@ -565,6 +565,7 @@ class WPBL_Admin_UI {
         $label          = $field['label'] ?? '';
         $desc           = $field['desc'] ?? '';
         $is_recommended = $field['recommended'] ?? false;
+        $is_new         = $field['new'] ?? false;
         $value          = $this->settings->get($key);
         $search         = strtolower(wp_strip_all_tags($label . ' ' . $desc));
         ?>
@@ -578,6 +579,7 @@ class WPBL_Admin_UI {
                     <label class="wpbl-setting-label" for="<?php echo esc_attr($key); ?>">
                         <?php echo esc_html($label); ?>
                         <?php if ($is_recommended): ?><span class="wpbl-badge-recommended"><?php echo esc_html(wpbl_t('badge_recommended')); ?></span><?php endif; ?>
+                        <?php if ($is_new): ?><span class="wpbl-badge-new"><?php echo esc_html(wpbl_t('badge_new')); ?></span><?php endif; ?>
                     </label>
                     <?php if ($desc): ?><span class="wpbl-setting-desc"><?php echo wp_kses_post($desc); ?></span><?php endif; ?>
                 </div>

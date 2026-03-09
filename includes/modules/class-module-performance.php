@@ -53,7 +53,7 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
                 'min'  => -1,
             ],
             ['key' => 'wpzaklad_disable_dashicons',    'type' => 'checkbox', 'label' => wpbl_t('disable_dashicons_label'),    'desc' => wpbl_t('disable_dashicons_desc'),    'recommended' => true, 'mine' => true],
-            ['key' => 'wpzaklad_disable_font_library', 'type' => 'checkbox', 'label' => wpbl_t('disable_font_library_label'), 'desc' => wpbl_t('disable_font_library_desc'), 'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_disable_font_library', 'type' => 'checkbox', 'label' => wpbl_t('disable_font_library_label'), 'desc' => wpbl_t('disable_font_library_desc'), 'recommended' => true, 'mine' => true, 'new' => true],
         ];
     }
 

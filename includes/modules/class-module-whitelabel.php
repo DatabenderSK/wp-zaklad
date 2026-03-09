@@ -12,6 +12,7 @@ class WPBL_Module_Whitelabel extends WPBL_Module_Base {
             'wpzaklad_admin_footer_text'      => '',
             'wpzaklad_hide_howdy'             => 0,
             'wpzaklad_hide_frontend_bar'      => 0,
+            'wpzaklad_manager_widget'         => 1,
             'wpzaklad_manager_name'           => '',
             'wpzaklad_manager_email'          => '',
             'wpzaklad_manager_phone'          => '',
@@ -52,6 +53,13 @@ class WPBL_Module_Whitelabel extends WPBL_Module_Base {
                 'desc'  => wpbl_t('hide_frontend_bar_desc'),
             ],
             // Manager contact widget
+            [
+                'key'         => 'wpzaklad_manager_widget',
+                'type'        => 'checkbox',
+                'label'       => wpbl_t('manager_widget_label'),
+                'desc'        => wpbl_t('manager_widget_desc'),
+                'mine'        => true,
+            ],
             [
                 'key'   => 'wpzaklad_manager_name',
                 'type'  => 'text',
@@ -100,7 +108,9 @@ class WPBL_Module_Whitelabel extends WPBL_Module_Base {
             add_action('after_setup_theme', [$this, 'hide_frontend_admin_bar']);
         }
 
-        add_action('wp_dashboard_setup', [$this, 'register_manager_widget']);
+        if ($this->get('wpzaklad_manager_widget')) {
+            add_action('wp_dashboard_setup', [$this, 'register_manager_widget']);
+        }
     }
 
     public function remove_wp_logo(\WP_Admin_Bar $wp_admin_bar): void {

@@ -38,7 +38,7 @@ class WPBL_Module_Security extends WPBL_Module_Base {
             ['key' => 'wpzaklad_disable_app_passwords',    'type' => 'checkbox', 'label' => wpbl_t('disable_app_passwords_label'),     'desc' => wpbl_t('disable_app_passwords_desc'),    'recommended' => true],
             ['key' => 'wpzaklad_disable_php_uploads',      'type' => 'checkbox', 'label' => wpbl_t('disable_php_uploads_label'),       'desc' => wpbl_t('disable_php_uploads_desc'),      'recommended' => true, 'mine' => true],
             ['key' => 'wpzaklad_custom_login_slug',        'type' => 'text',     'label' => wpbl_t('custom_login_slug_label'),         'desc' => wpbl_t('custom_login_slug_desc')],
-            ['key' => 'wpzaklad_extend_login_expiry',      'type' => 'checkbox', 'label' => wpbl_t('extend_login_expiry_label'),      'desc' => wpbl_t('extend_login_expiry_desc'),      'mine' => true],
+            ['key' => 'wpzaklad_extend_login_expiry',      'type' => 'checkbox', 'label' => wpbl_t('extend_login_expiry_label'),      'desc' => wpbl_t('extend_login_expiry_desc'),      'mine' => true, 'new' => true],
         ];
     }
 

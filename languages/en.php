@@ -8,6 +8,7 @@ return [
     'lang_label'              => 'Language',
     'search_placeholder'      => 'Search setting…',
     'badge_recommended'       => '✓ Recommended',
+    'badge_new'               => 'New',
     'select_image'            => 'Select Image',
     'remove_image'            => 'Remove',
 
@@ -388,7 +389,7 @@ return [
 
     // White Label – manager widget
     'manager_widget_label'              => 'Website Manager dashboard widget',
-    'manager_widget_desc'               => 'Shows website manager contact info on the main dashboard. Fill in at least a name, email, or phone number.',
+    'manager_widget_desc'               => 'Shows website manager contact info on the main dashboard. Widget appears when at least a name, email, or phone is filled in.',
     'manager_widget_title'              => 'Website Manager',
     'manager_name_label'                => 'Manager Name',
     'manager_email_label'               => 'Email',

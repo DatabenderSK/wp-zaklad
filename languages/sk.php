@@ -8,6 +8,7 @@ return [
     'lang_label'              => 'Jazyk',
     'search_placeholder'      => 'Hľadať nastavenie...',
     'badge_recommended'       => '✓ Odporúčané',
+    'badge_new'               => 'Novinka',
     'select_image'            => 'Vybrať obrázok',
     'remove_image'            => 'Odstrániť',
 
@@ -388,7 +389,7 @@ return [
 
     // White Label – manager widget
     'manager_widget_label'              => 'Widget „Správca webu" na dashboarde',
-    'manager_widget_desc'               => 'Zobrazí kontaktné údaje správcu webu na hlavnom dashboarde. Vyplň aspoň meno, email alebo telefón.',
+    'manager_widget_desc'               => 'Zobrazí kontaktné údaje správcu webu na hlavnom dashboarde. Widget sa zobrazí keď je vyplnené aspoň meno, email alebo telefón.',
     'manager_widget_title'              => 'Správca webu',
     'manager_name_label'                => 'Meno správcu',
     'manager_email_label'               => 'E-mail',

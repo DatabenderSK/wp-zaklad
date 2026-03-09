@@ -560,8 +560,15 @@ class WPBL_Admin_UI {
     }
 
     private function render_field(array $field): void {
-        $key            = $field['key'];
         $type           = $field['type'] ?? 'checkbox';
+
+        // Section heading – no key, just a label
+        if ($type === 'heading') {
+            echo '<h3 class="wpbl-section-heading">' . esc_html($field['label'] ?? '') . '</h3>';
+            return;
+        }
+
+        $key            = $field['key'];
         $label          = $field['label'] ?? '';
         $desc           = $field['desc'] ?? '';
         $is_recommended = $field['recommended'] ?? false;
@@ -600,7 +607,7 @@ class WPBL_Admin_UI {
                     <label class="wpbl-setting-label" for="<?php echo esc_attr($key); ?>">
                         <?php echo esc_html($label); ?>
                     </label>
-                    <input type="number" id="<?php echo esc_attr($key); ?>" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr((string) $value); ?>" class="small-text" min="<?php echo esc_attr((string) ($field['min'] ?? 0)); ?>">
+                    <input type="number" id="<?php echo esc_attr($key); ?>" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr((string) $value); ?>" class="small-text" min="<?php echo esc_attr((string) ($field['min'] ?? 0)); ?>"<?php if (isset($field['max'])): ?> max="<?php echo esc_attr((string) $field['max']); ?>"<?php endif; ?>>
                     <?php if ($desc): ?><span class="wpbl-setting-desc"><?php echo wp_kses_post($desc); ?></span><?php endif; ?>
                 </div>
 

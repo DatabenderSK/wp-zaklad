@@ -13,6 +13,7 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             'wpzaklad_disable_big_image'        => 0,
             'wpzaklad_revisions_limit'          => 10,
             'wpzaklad_disable_dashicons'        => 0,
+            'wpzaklad_disable_font_library'     => 0,
         ];
     }
 
@@ -51,7 +52,8 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
                 'desc'  => wpbl_t('revisions_limit_desc'),
                 'min'  => -1,
             ],
-            ['key' => 'wpzaklad_disable_dashicons', 'type' => 'checkbox', 'label' => wpbl_t('disable_dashicons_label'), 'desc' => wpbl_t('disable_dashicons_desc'), 'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_disable_dashicons',    'type' => 'checkbox', 'label' => wpbl_t('disable_dashicons_label'),    'desc' => wpbl_t('disable_dashicons_desc'),    'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_disable_font_library', 'type' => 'checkbox', 'label' => wpbl_t('disable_font_library_label'), 'desc' => wpbl_t('disable_font_library_desc'), 'recommended' => true, 'mine' => true],
         ];
     }
 
@@ -88,6 +90,10 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
             add_action('wp_enqueue_scripts', [$this, 'disable_dashicons']);
         }
 
+        if ($this->get('wpzaklad_disable_font_library')) {
+            add_filter('block_editor_settings_all', [$this, 'disable_font_library_editor']);
+            add_filter('rest_endpoints', [$this, 'remove_font_library_endpoints']);
+        }
     }
 
     public function disable_dashicons(): void {
@@ -97,6 +103,20 @@ class WPBL_Module_Performance extends WPBL_Module_Base {
         }
     }
 
+
+    public function disable_font_library_editor(array $settings): array {
+        $settings['fontLibraryEnabled'] = false;
+        return $settings;
+    }
+
+    public function remove_font_library_endpoints(array $endpoints): array {
+        foreach ($endpoints as $route => $data) {
+            if (str_contains($route, '/font-families')) {
+                unset($endpoints[$route]);
+            }
+        }
+        return $endpoints;
+    }
 
     public function remove_query_string(string $src): string {
         $parts = explode('?ver=', $src);

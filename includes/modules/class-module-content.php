@@ -19,6 +19,9 @@ class WPBL_Module_Content extends WPBL_Module_Base {
             'wpzaklad_clean_archive_titles'   => 0,
             'wpzaklad_disable_author_archive' => 0,
             'wpzaklad_duplicate_posts'        => 0,
+            'wpzaklad_featured_image_column'  => 0,
+            'wpzaklad_media_filesize_column'  => 0,
+            'wpzaklad_external_links_blank'   => 0,
         ];
     }
 
@@ -35,6 +38,9 @@ class WPBL_Module_Content extends WPBL_Module_Base {
             ['key' => 'wpzaklad_clean_archive_titles',   'type' => 'checkbox', 'label' => wpbl_t('clean_archive_titles_label'),      'desc' => wpbl_t('clean_archive_titles_desc')],
             ['key' => 'wpzaklad_disable_author_archive', 'type' => 'checkbox', 'label' => wpbl_t('disable_author_archive_label'),    'desc' => wpbl_t('disable_author_archive_desc')],
             ['key' => 'wpzaklad_duplicate_posts',        'type' => 'checkbox', 'label' => wpbl_t('duplicate_posts_label'),           'desc' => wpbl_t('duplicate_posts_desc'),           'recommended' => true, 'mine' => true],
+            ['key' => 'wpzaklad_featured_image_column',  'type' => 'checkbox', 'label' => wpbl_t('featured_image_column_label'),    'desc' => wpbl_t('featured_image_column_desc'),    'mine' => true],
+            ['key' => 'wpzaklad_media_filesize_column',  'type' => 'checkbox', 'label' => wpbl_t('media_filesize_column_label'),    'desc' => wpbl_t('media_filesize_column_desc'),    'mine' => true],
+            ['key' => 'wpzaklad_external_links_blank',   'type' => 'checkbox', 'label' => wpbl_t('external_links_blank_label'),     'desc' => wpbl_t('external_links_blank_desc'),     'mine' => true],
         ];
     }
 
@@ -81,6 +87,20 @@ class WPBL_Module_Content extends WPBL_Module_Base {
             add_filter('post_row_actions',  [$this, 'add_duplicate_link'], 10, 2);
             add_filter('page_row_actions',  [$this, 'add_duplicate_link'], 10, 2);
             add_action('admin_action_wpbl_duplicate_post', [$this, 'handle_duplicate']);
+        }
+        if ($this->get('wpzaklad_featured_image_column')) {
+            add_filter('manage_posts_columns',        [$this, 'add_thumbnail_column']);
+            add_filter('manage_pages_columns',        [$this, 'add_thumbnail_column']);
+            add_action('manage_posts_custom_column',  [$this, 'render_thumbnail_column'], 10, 2);
+            add_action('manage_pages_custom_column',  [$this, 'render_thumbnail_column'], 10, 2);
+            add_action('admin_head', [$this, 'thumbnail_column_css']);
+        }
+        if ($this->get('wpzaklad_media_filesize_column')) {
+            add_filter('manage_upload_columns',       [$this, 'add_filesize_column']);
+            add_action('manage_media_custom_column',  [$this, 'render_filesize_column'], 10, 2);
+        }
+        if ($this->get('wpzaklad_external_links_blank')) {
+            add_filter('the_content', [$this, 'external_links_new_tab'], 20);
         }
     }
 
@@ -361,6 +381,79 @@ class WPBL_Module_Content extends WPBL_Module_Base {
 
         wp_safe_redirect(admin_url('post.php?action=edit&post=' . $new_id));
         exit;
+    }
+
+    // -------------------------------------------------------------------------
+    // Featured image column
+    // -------------------------------------------------------------------------
+
+    public function add_thumbnail_column(array $columns): array {
+        $new = [];
+        foreach ($columns as $key => $label) {
+            $new[$key] = $label;
+            if ($key === 'title') {
+                $new['wpbl_thumbnail'] = wpbl_t('featured_image_column_header');
+            }
+        }
+        return $new;
+    }
+
+    public function render_thumbnail_column(string $column, int $post_id): void {
+        if ($column !== 'wpbl_thumbnail') return;
+        $thumb = get_the_post_thumbnail($post_id, [60, 60]);
+        echo $thumb ?: '—';
+    }
+
+    public function thumbnail_column_css(): void {
+        echo '<style>.column-wpbl_thumbnail{width:70px;}</style>' . "\n";
+    }
+
+    // -------------------------------------------------------------------------
+    // Media filesize column
+    // -------------------------------------------------------------------------
+
+    public function add_filesize_column(array $columns): array {
+        $columns['wpbl_filesize'] = wpbl_t('media_filesize_column_header');
+        return $columns;
+    }
+
+    public function render_filesize_column(string $column, int $post_id): void {
+        if ($column !== 'wpbl_filesize') return;
+        $file = get_attached_file($post_id);
+        if ($file && file_exists($file)) {
+            echo esc_html(size_format(filesize($file), 2));
+        } else {
+            echo '—';
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // External links in new tab
+    // -------------------------------------------------------------------------
+
+    public function external_links_new_tab(string $content): string {
+        if (empty($content)) return $content;
+
+        $home_host = wp_parse_url(home_url(), PHP_URL_HOST);
+
+        return preg_replace_callback(
+            '/<a\s([^>]*href=["\']https?:\/\/[^"\']+["\'][^>]*)>/i',
+            function (array $m) use ($home_host) {
+                $tag = $m[0];
+                // Skip if already has target
+                if (preg_match('/\btarget\s*=/i', $tag)) return $tag;
+                // Extract href host
+                if (preg_match('/href=["\']https?:\/\/([^"\'\/]+)/i', $tag, $href)) {
+                    $link_host = strtolower($href[1]);
+                    if ($link_host === $home_host || str_ends_with($link_host, '.' . $home_host)) {
+                        return $tag; // internal link
+                    }
+                }
+                // Add target and rel
+                return str_replace('<a ', '<a target="_blank" rel="noopener noreferrer" ', $tag);
+            },
+            $content
+        );
     }
 
     private function disable_comments(): void {

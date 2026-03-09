@@ -399,6 +399,36 @@ return [
     'manager_booking_desc'              => 'URL to Calendly, Cal.com or a contact form. Leave empty if not needed.',
     'manager_booking_btn'               => 'Schedule a meeting',
 
+    // Scripts – Conversion pixels
+    'pixels_section_title'              => 'Conversion Pixels',
+    'pixels_section_desc'               => 'Tracking pixels for advertising platforms. They work independently of analytics above – can run alongside GTM/GA4.',
+    'fb_pixel_id_label'                 => 'Facebook Pixel ID',
+    'clarity_id_label'                  => 'Microsoft Clarity Project ID',
+    'tiktok_pixel_id_label'             => 'TikTok Pixel ID',
+    'bing_uet_id_label'                 => 'Microsoft Ads (Bing) UET Tag ID',
+    'linkedin_partner_id_label'         => 'LinkedIn Insight Partner ID',
+    'x_pixel_id_label'                  => 'X (Twitter) Pixel ID',
+    'pinterest_tag_id_label'            => 'Pinterest Tag ID',
+    'pixels_exclude_admins_label'       => 'Exclude admin visits from tracking',
+
+    // Content – new v1.4
+    'featured_image_column_label'       => 'Featured Image Column',
+    'featured_image_column_desc'        => 'Adds a thumbnail column to the posts and pages list view.',
+    'featured_image_column_header'      => 'Image',
+    'media_filesize_column_label'       => 'Media File Size Column',
+    'media_filesize_column_desc'        => 'Shows file size for each item in the media library.',
+    'media_filesize_column_header'      => 'Size',
+    'external_links_blank_label'        => 'External Links in New Tab',
+    'external_links_blank_desc'         => 'Automatically adds target="_blank" and rel="noopener noreferrer" to all external links in post content.',
+
+    // Security – new v1.4
+    'extend_login_expiry_label'         => 'Extend Login to 30 Days',
+    'extend_login_expiry_desc'          => 'Sets the login cookie expiration to 30 days instead of the default 2 days (48 hours).',
+
+    // Performance – new v1.4
+    'disable_font_library_label'        => 'Disable Font Library',
+    'disable_font_library_desc'         => 'Removes the Font Library panel from the block editor and blocks font-related REST API endpoints. Unnecessary if fonts are managed by your theme.',
+
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Maintenance Start',
     'maintenance_start_desc'            => 'Optional. Maintenance mode activates from this date and time. Leave empty for immediate activation.',

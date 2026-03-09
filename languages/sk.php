@@ -399,6 +399,36 @@ return [
     'manager_booking_desc'              => 'URL na Calendly, Cal.com alebo kontaktný formulár. Nechaj prázdne ak nepotrebuješ.',
     'manager_booking_btn'               => 'Naplánovať schôdzku',
 
+    // Scripts – Conversion pixels
+    'pixels_section_title'              => 'Konverzné pixely',
+    'pixels_section_desc'               => 'Sledovacie pixely pre reklamné platformy. Fungujú nezávisle od analytiky vyššie – môžu bežať súčasne s GTM/GA4.',
+    'fb_pixel_id_label'                 => 'Facebook Pixel ID',
+    'clarity_id_label'                  => 'Microsoft Clarity Project ID',
+    'tiktok_pixel_id_label'             => 'TikTok Pixel ID',
+    'bing_uet_id_label'                 => 'Microsoft Ads (Bing) UET Tag ID',
+    'linkedin_partner_id_label'         => 'LinkedIn Insight Partner ID',
+    'x_pixel_id_label'                  => 'X (Twitter) Pixel ID',
+    'pinterest_tag_id_label'            => 'Pinterest Tag ID',
+    'pixels_exclude_admins_label'       => 'Nezaznamenávať návštevy administrátorov',
+
+    // Content – new v1.4
+    'featured_image_column_label'       => 'Stĺpec s náhľadovým obrázkom',
+    'featured_image_column_desc'        => 'Pridá stĺpec s miniatúrou náhľadového obrázka do zoznamu príspevkov a stránok.',
+    'featured_image_column_header'      => 'Obrázok',
+    'media_filesize_column_label'       => 'Stĺpec s veľkosťou súboru v médiách',
+    'media_filesize_column_desc'        => 'Zobrazí veľkosť súboru pre každú položku v knižnici médií.',
+    'media_filesize_column_header'      => 'Veľkosť',
+    'external_links_blank_label'        => 'Externé odkazy v novom okne',
+    'external_links_blank_desc'         => 'Automaticky pridá target="_blank" a rel="noopener noreferrer" na všetky externé odkazy v obsahu príspevkov.',
+
+    // Security – new v1.4
+    'extend_login_expiry_label'         => 'Predĺžiť prihlásenie na 30 dní',
+    'extend_login_expiry_desc'          => 'Nastaví dobu platnosti prihlasovacej cookie na 30 dní namiesto predvolených 2 dní (48 hodín).',
+
+    // Performance – new v1.4
+    'disable_font_library_label'        => 'Vypnúť Knižnicu fontov',
+    'disable_font_library_desc'         => 'Odstráni panel Knižnica fontov z editora blokov a zablokuje REST API endpointy pre fonty. Zbytočné ak fonty spravujete cez tému.',
+
     // Maintenance – scheduled
     'maintenance_start_label'           => 'Začiatok údržby',
     'maintenance_start_desc'            => 'Nepovinné. Maintenance mode sa aktivuje až od tohto dátumu a času. Nechaj prázdne pre okamžitú aktiváciu.',

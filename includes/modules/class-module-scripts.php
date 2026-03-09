@@ -17,6 +17,15 @@ class WPBL_Module_Scripts extends WPBL_Module_Base {
             'wpzaklad_ga4_id'                 => '',
             'wpzaklad_ga4_position'           => 'head',
             'wpzaklad_ga4_exclude_admins'     => 0,
+            // Conversion pixels
+            'wpzaklad_fb_pixel_id'            => '',
+            'wpzaklad_clarity_id'             => '',
+            'wpzaklad_tiktok_pixel_id'        => '',
+            'wpzaklad_bing_uet_id'            => '',
+            'wpzaklad_linkedin_partner_id'    => '',
+            'wpzaklad_x_pixel_id'             => '',
+            'wpzaklad_pinterest_tag_id'       => '',
+            'wpzaklad_pixels_exclude_admins'  => 0,
             // Custom code
             'wpzaklad_head_code'              => '',
             'wpzaklad_footer_code'            => '',
@@ -78,6 +87,65 @@ class WPBL_Module_Scripts extends WPBL_Module_Base {
                     }
                 }
                 break;
+        }
+
+        // Conversion pixels
+        $pixels_exclude = (bool) $this->get('wpzaklad_pixels_exclude_admins');
+
+        $fb_pixel = sanitize_text_field((string) $this->get('wpzaklad_fb_pixel_id'));
+        if ($fb_pixel) {
+            add_action('wp_head', function () use ($fb_pixel, $pixels_exclude) {
+                if ($pixels_exclude && current_user_can('manage_options')) return;
+                $this->output_fb_pixel($fb_pixel);
+            }, 2);
+        }
+
+        $clarity = sanitize_text_field((string) $this->get('wpzaklad_clarity_id'));
+        if ($clarity) {
+            add_action('wp_head', function () use ($clarity, $pixels_exclude) {
+                if ($pixels_exclude && current_user_can('manage_options')) return;
+                $this->output_clarity($clarity);
+            }, 2);
+        }
+
+        $tiktok = sanitize_text_field((string) $this->get('wpzaklad_tiktok_pixel_id'));
+        if ($tiktok) {
+            add_action('wp_head', function () use ($tiktok, $pixels_exclude) {
+                if ($pixels_exclude && current_user_can('manage_options')) return;
+                $this->output_tiktok_pixel($tiktok);
+            }, 2);
+        }
+
+        $bing = sanitize_text_field((string) $this->get('wpzaklad_bing_uet_id'));
+        if ($bing) {
+            add_action('wp_head', function () use ($bing, $pixels_exclude) {
+                if ($pixels_exclude && current_user_can('manage_options')) return;
+                $this->output_bing_uet($bing);
+            }, 2);
+        }
+
+        $linkedin = sanitize_text_field((string) $this->get('wpzaklad_linkedin_partner_id'));
+        if ($linkedin) {
+            add_action('wp_head', function () use ($linkedin, $pixels_exclude) {
+                if ($pixels_exclude && current_user_can('manage_options')) return;
+                $this->output_linkedin($linkedin);
+            }, 2);
+        }
+
+        $x_pixel = sanitize_text_field((string) $this->get('wpzaklad_x_pixel_id'));
+        if ($x_pixel) {
+            add_action('wp_head', function () use ($x_pixel, $pixels_exclude) {
+                if ($pixels_exclude && current_user_can('manage_options')) return;
+                $this->output_x_pixel($x_pixel);
+            }, 2);
+        }
+
+        $pinterest = sanitize_text_field((string) $this->get('wpzaklad_pinterest_tag_id'));
+        if ($pinterest) {
+            add_action('wp_head', function () use ($pinterest, $pixels_exclude) {
+                if ($pixels_exclude && current_user_can('manage_options')) return;
+                $this->output_pinterest($pinterest);
+            }, 2);
         }
 
         if ($this->get('wpzaklad_head_code')) {
@@ -180,6 +248,54 @@ class WPBL_Module_Scripts extends WPBL_Module_Base {
     }
 
     // -------------------------------------------------------------------------
+    // Conversion pixels
+    // -------------------------------------------------------------------------
+
+    private function output_fb_pixel(string $id): void {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo "<!-- Meta Pixel -->\n<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','" . esc_js($id) . "');fbq('track','PageView');</script>\n";
+        echo '<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=' . esc_attr($id) . '&ev=PageView&noscript=1" alt=""></noscript>' . "\n";
+        echo "<!-- End Meta Pixel -->\n";
+    }
+
+    private function output_clarity(string $id): void {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo "<!-- Microsoft Clarity -->\n<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src='https://www.clarity.ms/tag/'+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,'clarity','script','" . esc_js($id) . "');</script>\n<!-- End Clarity -->\n";
+    }
+
+    private function output_tiktok_pixel(string $id): void {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo "<!-- TikTok Pixel -->\n<script>!function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=['page','track','identify','instances','debug','on','off','once','ready','alias','group','enableCookie','disableCookie','holdConsent','revokeConsent','grantConsent'],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};ttq.load=function(e,n){var r='https://analytics.tiktok.com/i18n/pixel/events.js',o=n&&n.partner;ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e+\"_\"+o]=1;var i=d.createElement('script');i.type='text/javascript';i.async=!0;i.src=r+'?sdkid='+e+'&lib='+t;var a=d.getElementsByTagName('script')[0];a.parentNode.insertBefore(i,a)};ttq.load('" . esc_js($id) . "');ttq.page();}(window,document,'ttq');</script>\n<!-- End TikTok Pixel -->\n";
+    }
+
+    private function output_bing_uet(string $id): void {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo "<!-- Microsoft UET -->\n<script>(function(w,d,t,r,u){var f,n,i;w[u]=w[u]||[],f=function(){var o={ti:\"" . esc_js($id) . "\"};o.q=w[u],w[u]=new UET(o),w[u].push(\"pageLoad\")},n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function(){var s=this.readyState;s&&s!==\"loaded\"&&s!==\"complete\"||(f(),n.onload=n.onreadystatechange=null)},i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)})(window,document,\"script\",\"//bat.bing.com/bat.js\",\"uetq\");</script>\n";
+        echo '<noscript><img src="//bat.bing.com/action/0?ti=' . esc_attr($id) . '&amp;Ver=2" height="0" width="0" style="display:none;visibility:hidden;" alt=""></noscript>' . "\n";
+        echo "<!-- End Microsoft UET -->\n";
+    }
+
+    private function output_linkedin(string $id): void {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo "<!-- LinkedIn Insight -->\n<script>_linkedin_partner_id=\"" . esc_js($id) . "\";window._linkedin_data_partner_ids=window._linkedin_data_partner_ids||[];window._linkedin_data_partner_ids.push(_linkedin_partner_id);</script>\n";
+        echo "<script>(function(l){if(!l){window.lintrk=function(a,b){window.lintrk.q.push([a,b])};window.lintrk.q=[]}var s=document.getElementsByTagName(\"script\")[0];var b=document.createElement(\"script\");b.type=\"text/javascript\";b.async=true;b.src=\"https://snap.licdn.com/li.lms-analytics/insight.min.js\";s.parentNode.insertBefore(b,s);})(window.lintrk);</script>\n";
+        echo '<noscript><img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=' . esc_attr($id) . '&amp;fmt=gif"></noscript>' . "\n";
+        echo "<!-- End LinkedIn Insight -->\n";
+    }
+
+    private function output_x_pixel(string $id): void {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo "<!-- X Pixel -->\n<script>!function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments)},s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');twq('config','" . esc_js($id) . "');</script>\n<!-- End X Pixel -->\n";
+    }
+
+    private function output_pinterest(string $id): void {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo "<!-- Pinterest Tag -->\n<script>!function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");pintrk('load','" . esc_js($id) . "');pintrk('page');</script>\n";
+        echo '<noscript><img height="1" width="1" style="display:none;" alt="" src="https://ct.pinterest.com/v3/?tid=' . esc_attr($id) . '&amp;event=init&amp;noscript=1"></noscript>' . "\n";
+        echo "<!-- End Pinterest Tag -->\n";
+    }
+
+    // -------------------------------------------------------------------------
     // Admin tab
     // -------------------------------------------------------------------------
 
@@ -250,6 +366,59 @@ class WPBL_Module_Scripts extends WPBL_Module_Base {
 
         <input type="hidden" name="wpzaklad_analytics_type" id="wpzaklad_analytics_type" value="<?php echo esc_attr($type); ?>">
 
+        <?php
+        // Conversion pixels section
+        $fb_pixel   = (string) $this->get('wpzaklad_fb_pixel_id');
+        $clarity    = (string) $this->get('wpzaklad_clarity_id');
+        $tiktok     = (string) $this->get('wpzaklad_tiktok_pixel_id');
+        $bing_uet   = (string) $this->get('wpzaklad_bing_uet_id');
+        $linkedin   = (string) $this->get('wpzaklad_linkedin_partner_id');
+        $x_pixel    = (string) $this->get('wpzaklad_x_pixel_id');
+        $pinterest  = (string) $this->get('wpzaklad_pinterest_tag_id');
+        $px_excl    = (bool)   $this->get('wpzaklad_pixels_exclude_admins');
+        ?>
+        <div class="wpbl-setting" style="margin-top:20px;">
+            <div class="wpbl-setting-info">
+                <strong class="wpbl-setting-label"><?php echo esc_html(wpbl_t('pixels_section_title')); ?></strong>
+                <span class="wpbl-setting-desc"><?php echo esc_html(wpbl_t('pixels_section_desc')); ?></span>
+
+                <div style="margin-top:12px;display:flex;flex-direction:column;gap:14px;">
+                    <div>
+                        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('fb_pixel_id_label')); ?></label>
+                        <input type="text" name="wpzaklad_fb_pixel_id" value="<?php echo esc_attr($fb_pixel); ?>" class="regular-text" placeholder="123456789012345">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('clarity_id_label')); ?></label>
+                        <input type="text" name="wpzaklad_clarity_id" value="<?php echo esc_attr($clarity); ?>" class="regular-text" placeholder="abc1def2gh">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('tiktok_pixel_id_label')); ?></label>
+                        <input type="text" name="wpzaklad_tiktok_pixel_id" value="<?php echo esc_attr($tiktok); ?>" class="regular-text" placeholder="ABCDEF123456">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('bing_uet_id_label')); ?></label>
+                        <input type="text" name="wpzaklad_bing_uet_id" value="<?php echo esc_attr($bing_uet); ?>" class="regular-text" placeholder="5637647">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('linkedin_partner_id_label')); ?></label>
+                        <input type="text" name="wpzaklad_linkedin_partner_id" value="<?php echo esc_attr($linkedin); ?>" class="regular-text" placeholder="123456">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('x_pixel_id_label')); ?></label>
+                        <input type="text" name="wpzaklad_x_pixel_id" value="<?php echo esc_attr($x_pixel); ?>" class="regular-text" placeholder="obw0r">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;"><?php echo esc_html(wpbl_t('pinterest_tag_id_label')); ?></label>
+                        <input type="text" name="wpzaklad_pinterest_tag_id" value="<?php echo esc_attr($pinterest); ?>" class="regular-text" placeholder="2612741693333">
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="wpzaklad_pixels_exclude_admins" name="wpzaklad_pixels_exclude_admins" value="1" <?php checked($px_excl); ?>>
+                        <label for="wpzaklad_pixels_exclude_admins" style="font-size:13px;"><?php echo esc_html(wpbl_t('pixels_exclude_admins_label')); ?></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <style>
         .wpbl-analytics-options { display: flex; flex-direction: column; gap: 6px; }
         .wpbl-analytics-radio   { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; padding: 2px 0; }
@@ -305,6 +474,16 @@ class WPBL_Module_Scripts extends WPBL_Module_Base {
             'wpzaklad_ga4_position'       => in_array($post['wpzaklad_ga4_position'] ?? '', ['head', 'footer'], true) ? $post['wpzaklad_ga4_position'] : 'head',
             'wpzaklad_ga4_exclude_admins' => isset($post['wpzaklad_ga4_exclude_admins']) ? 1 : 0,
         ];
+
+        // Conversion pixels
+        $updates['wpzaklad_fb_pixel_id']           = sanitize_text_field(wp_unslash($post['wpzaklad_fb_pixel_id'] ?? ''));
+        $updates['wpzaklad_clarity_id']            = sanitize_text_field(wp_unslash($post['wpzaklad_clarity_id'] ?? ''));
+        $updates['wpzaklad_tiktok_pixel_id']       = sanitize_text_field(wp_unslash($post['wpzaklad_tiktok_pixel_id'] ?? ''));
+        $updates['wpzaklad_bing_uet_id']           = sanitize_text_field(wp_unslash($post['wpzaklad_bing_uet_id'] ?? ''));
+        $updates['wpzaklad_linkedin_partner_id']   = sanitize_text_field(wp_unslash($post['wpzaklad_linkedin_partner_id'] ?? ''));
+        $updates['wpzaklad_x_pixel_id']            = sanitize_text_field(wp_unslash($post['wpzaklad_x_pixel_id'] ?? ''));
+        $updates['wpzaklad_pinterest_tag_id']      = sanitize_text_field(wp_unslash($post['wpzaklad_pinterest_tag_id'] ?? ''));
+        $updates['wpzaklad_pixels_exclude_admins'] = isset($post['wpzaklad_pixels_exclude_admins']) ? 1 : 0;
 
         $this->settings->patch($updates);
 

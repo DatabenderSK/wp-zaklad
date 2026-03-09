@@ -24,16 +24,18 @@ define('WPBL_BASENAME', plugin_basename(__FILE__));
 
 // -------------------------------------------------------------------------
 // Auto-update via GitHub (plugin-update-checker v5)
+// Uses GitHub Releases – create a Release tagged "v1.0.x" for each version.
 // -------------------------------------------------------------------------
 $puc_file = WPBL_DIR . 'libs/plugin-update-checker/plugin-update-checker.php';
 if (file_exists($puc_file)) {
     require_once $puc_file;
-    $checker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+    YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
         'https://github.com/DatabenderSK/wp-zaklad/',
         __FILE__,
         'wp-zaklad'
     );
-    $checker->setBranch('main');
+    // No setBranch() – PUC defaults to GitHub Releases.
+    // Version is read from the Release tag (e.g. "v1.0.8").
 }
 
 // -------------------------------------------------------------------------
